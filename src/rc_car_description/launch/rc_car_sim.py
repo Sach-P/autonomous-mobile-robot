@@ -118,59 +118,46 @@ def launch_setup(context, *args, **kwargs):
         parameters=[{"use_sim_time": True}],
     )
 
-    # ── 7. Ground truth TF: odom -> base_footprint ─────────────
-    ground_truth_tf = ExecuteProcess(
-        cmd=["python3", "-c",
-"""
-import rclpy
-from rclpy.node import Node
-from geometry_msgs.msg import PoseArray, TransformStamped
-from tf2_ros import TransformBroadcaster
+    ekf_node = Node(
+        package='robot_localization',
+        executable='ekf_node',
+        name='ekf_filter_node',
+        output='screen',
+        parameters=[{
+            'use_sim_time': True,
 
-class GzTF(Node):
-    def __init__(self):
-        super().__init__('gz_ground_truth_tf')
-        self.br = TransformBroadcaster(self)
-        self.rc_car_index = None
-        self.create_subscription(PoseArray,
-            '/world/cat_robotics_world/pose/info', self.cb, 10)
+            # INPUT
+            'odom0': '/ackermann_steering_controller/odometry',
 
-    def cb(self, msg):
-        # Auto-detect rc_car index by finding the pose closest
-        # to spawn position (-2.74, -0.46) on first message
-        if self.rc_car_index is None:
-            best = None
-            best_dist = 9999
-            for i, p in enumerate(msg.poses):
-                d = ((p.position.x - (-2.74))**2 +
-                     (p.position.y - (-0.46))**2) ** 0.5
-                if d < best_dist:
-                    best_dist = d
-                    best = i
-            if best_dist < 1.0:
-                self.rc_car_index = best
-                self.get_logger().info(
-                    f'rc_car found at index {best} dist={best_dist:.3f}')
-            return
+            'odom0_config': [
+                True,  True,  False,   # x, y, z
+                False, False, True,    # roll, pitch, yaw
+                True,  True,  False,   # vx, vy, vz
+                False, False, True,    # vroll, vpitch, vyaw
+                False, False, False
+            ],
 
-        if len(msg.poses) <= self.rc_car_index:
-            return
+            # FRAMES
+            'base_link_frame': 'base_footprint',
+            'odom_frame': 'odom',
+            'world_frame': 'odom',
 
-        p = msg.poses[self.rc_car_index]
-        t = TransformStamped()
-        t.header.stamp = msg.header.stamp
-        t.header.frame_id = 'odom'
-        t.child_frame_id = 'base_footprint'
-        t.transform.translation.x = p.position.x
-        t.transform.translation.y = p.position.y
-        t.transform.translation.z = 0.0
-        t.transform.rotation = p.orientation
-        self.br.sendTransform(t)
+            # OUTPUT
+            'publish_tf': True,
 
-rclpy.init()
-rclpy.spin(GzTF())
-"""],
-        output="screen",
+            # SETTINGS
+            'two_d_mode': True,
+            'frequency': 50.0,
+        }],
+    )
+
+    cmd_vel_relay = Node(
+        package='topic_tools',
+        executable='relay',
+        arguments=[
+            '/cmd_vel',
+            '/ackermann_steering_controller/reference_unstamped'
+        ],
     )
 
     # ── 8. RViz ────────────────────────────────────────────────
@@ -191,8 +178,9 @@ rclpy.spin(GzTF())
         bridge,
         joint_state_broadcaster,
         ackermann_controller,
+        ekf_node,
         map_to_odom,
-        ground_truth_tf,
+        cmd_vel_relay,
     ]
     if use_rviz == "true":
         nodes.append(rviz_node)
