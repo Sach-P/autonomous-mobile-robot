@@ -5,7 +5,7 @@ from launch.actions import (
     DeclareLaunchArgument, TimerAction,
     OpaqueFunction, ExecuteProcess
 )
-from launch.conditions import UnlessCondition, IfCondition
+from launch.conditions import UnlessCondition
 from launch.substitutions import LaunchConfiguration, Command
 from launch_ros.parameter_descriptions import ParameterValue
 from launch_ros.actions import Node
@@ -122,10 +122,6 @@ def launch_setup(context, *args, **kwargs):
         condition=UnlessCondition(use_slam_config),
     )
 
-    # Determine world frame based on SLAM usage
-    # When SLAM is enabled, map is the world frame; otherwise, odom is
-    # ACTUALLY: EKF should always publish odom->base_footprint
-    # SLAM handles map->odom, so always use 'odom' as world_frame
     world_frame = 'odom'
 
     ekf_node = Node(
@@ -147,6 +143,15 @@ def launch_setup(context, *args, **kwargs):
                 False, False, False
             ],
 
+            'imu0': '/imu/data',
+            'imu0_config': [
+                False, False, False,   # x, y, z
+                True,  True,  True,    # roll, pitch, yaw
+                False, False, False,   # vx, vy, vz
+                False, False, False,   # vroll, vpitch, vyaw
+                False, False, False
+            ],
+
             # FRAMES
             'base_link_frame': 'base_footprint',
             'odom_frame': 'odom',
@@ -159,8 +164,6 @@ def launch_setup(context, *args, **kwargs):
             'two_d_mode': True,
             'frequency': 50.0,
         }],
-        # Disable EKF when SLAM is enabled - SLAM will handle map->odom
-        condition=UnlessCondition(use_slam_config),
     )
 
     cmd_vel_relay = Node(
@@ -170,18 +173,6 @@ def launch_setup(context, *args, **kwargs):
             '/cmd_vel',
             '/ackermann_steering_controller/reference_unstamped'
         ],
-    )
-
-    # ── 7b. Odometry to TF broadcaster (when SLAM is enabled) ──
-    # Publishes odom -> base_footprint transform from raw odometry
-    # This replaces EKF when SLAM is running
-    odom_to_tf = Node(
-        package='robot_bringup',
-        executable='odometry_to_tf',
-        name='odometry_to_tf',
-        output='screen',
-        parameters=[{'use_sim_time': True}],
-        condition=IfCondition(use_slam_config),
     )
 
     # ── 8. RViz ────────────────────────────────────────────────

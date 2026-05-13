@@ -14,8 +14,8 @@ class KeyboardTeleop:
         # Control parameters
         self.speed = 0.0
         self.steer = 0.0
-        self.max_speed = 5.0
-        self.max_steer = 2.5
+        self.max_speed = 1.0
+        self.max_steer = 0.5
 
         # Key states - tracks which keys are currently held down
         self.keys_pressed = set()
