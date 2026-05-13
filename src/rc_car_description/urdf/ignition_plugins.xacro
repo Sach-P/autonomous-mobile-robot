@@ -153,48 +153,32 @@
   </gazebo>
 
   <!-- ============================================================
-       3D LIDAR SENSOR  (Velodyne VLP-16 style)
-       16 channels, 360 deg horizontal, 100m range
+       2D LIDAR SENSOR (planar scan)
+       Simulates a single-layer laser scanner for Nav2/SLAM
        Note: no XML comments inside sensor block — Gazebo 6 parser bug
   ============================================================ -->
-  <gazebo reference="lidar_link">
-    <sensor name="lidar_3d" type="gpu_lidar">
-    <!-- <sensor name="lidar_3d" type="lidar"> -->
-      <always_on>true</always_on>
+ <gazebo reference="lidar_link">
+    <sensor name="laser_2d" type="gpu_lidar"> <!-- Changed from ray to gpu_lidar -->
+      <gz_frame_id>lidar_link</gz_frame_id> <!-- Required for correct TF in ROS -->
       <update_rate>10</update_rate>
-      <visualize>true</visualize>
-      <topic>/lidar</topic>
-      <!-- <plugin filename="libignition-gazebo-sensors-system.so"
-              name="ignition::gazebo::systems::Sensors">
-      </plugin> -->
+      <topic>scan</topic>
       <lidar>
         <scan>
           <horizontal>
-            <samples>1800</samples>
+            <samples>360</samples>
             <resolution>1</resolution>
-            <min_angle>-3.14159265</min_angle>
-            <max_angle>3.14159265</max_angle>
+            <min_angle>-3.14159</min_angle>
+            <max_angle>3.14159</max_angle>
           </horizontal>
-          <vertical>
-            <samples>16</samples>
-            <resolution>1</resolution>
-            <min_angle>-0.261799</min_angle>
-            <max_angle>0.261799</max_angle>
-          </vertical>
         </scan>
         <range>
-          <min>0.10</min>
-          <max>100.0</max>
+          <min>0.1</min>
+          <max>30.0</max>
           <resolution>0.01</resolution>
         </range>
-        <noise>
-          <type>gaussian</type>
-          <mean>0.0</mean>
-          <stddev>0.01</stddev>
-        </noise>
       </lidar>
+      <visualize>true</visualize>
     </sensor>
-    <material>Gazebo/DarkGrey</material>
   </gazebo>
 
   <!-- ============================================================

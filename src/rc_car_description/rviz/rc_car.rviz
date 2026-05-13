@@ -90,6 +90,25 @@ Visualization Manager:
       Use rainbow: true
       Value: true
 
+    - Class: rviz_default_plugins/LaserScan
+      Alpha: 1
+      Color: 255; 255; 0
+      Enabled: true
+      Name: LaserScan
+      Size: 0.05
+      Style: FlatSquares
+      Topic:
+        Value: /scan
+      Value: true
+
+    - Class: rviz_default_plugins/Map
+      Alpha: 0.8
+      Enabled: true
+      Name: Map
+      Topic:
+        Value: /map
+      Value: true
+
     - Class: rviz_default_plugins/Imu
       Enabled: true
       Name: IMU
@@ -154,7 +173,7 @@ Visualization Manager:
   Enabled: true
   Global Options:
     Background Color: 48; 48; 48
-    Fixed Frame: odom
+    Fixed Frame: map
     Frame Rate: 30
   Name: root
   Tools:

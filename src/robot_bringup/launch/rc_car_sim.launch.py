@@ -5,6 +5,7 @@ from launch.actions import (
     DeclareLaunchArgument, TimerAction,
     OpaqueFunction, ExecuteProcess
 )
+from launch.conditions import UnlessCondition, IfCondition
 from launch.substitutions import LaunchConfiguration, Command
 from launch_ros.parameter_descriptions import ParameterValue
 from launch_ros.actions import Node
@@ -14,6 +15,8 @@ def launch_setup(context, *args, **kwargs):
     pkg = get_package_share_directory("rc_car_description")
 
     use_rviz  = LaunchConfiguration("rviz").perform(context)
+    use_slam_config = LaunchConfiguration("use_slam")
+    use_slam  = use_slam_config.perform(context)
     world_arg = LaunchConfiguration("world").perform(context)
     x_pos     = LaunchConfiguration("x").perform(context)
     y_pos     = LaunchConfiguration("y").perform(context)
@@ -73,8 +76,8 @@ def launch_setup(context, *args, **kwargs):
             "/ackermann_steering_controller/odometry@nav_msgs/msg/Odometry[ignition.msgs.Odometry",
             "/world/cat_robotics_world/pose/info@geometry_msgs/msg/PoseArray[ignition.msgs.Pose_V",
 
-            # 3D LiDAR — PointCloud2
-            '/lidar/points@sensor_msgs/msg/PointCloud2[ignition.msgs.PointCloudPacked',
+            # 2D LiDAR — LaserScan
+            '/scan@sensor_msgs/msg/LaserScan[ignition.msgs.LaserScan',
             # IMU
             '/imu/data@sensor_msgs/msg/Imu[ignition.msgs.IMU',
             # Camera image
@@ -109,14 +112,21 @@ def launch_setup(context, *args, **kwargs):
         )],
     )
 
-    # ── 6. Static TF: map -> odom ──────────────────────────────
+    # ── 6. Static TF: map -> odom (only when SLAM is disabled) ──
     map_to_odom = Node(
         package="tf2_ros",
         executable="static_transform_publisher",
         name="map_to_odom",
         arguments=["0", "0", "0", "0", "0", "0", "map", "odom"],
         parameters=[{"use_sim_time": True}],
+        condition=UnlessCondition(use_slam_config),
     )
+
+    # Determine world frame based on SLAM usage
+    # When SLAM is enabled, map is the world frame; otherwise, odom is
+    # ACTUALLY: EKF should always publish odom->base_footprint
+    # SLAM handles map->odom, so always use 'odom' as world_frame
+    world_frame = 'odom'
 
     ekf_node = Node(
         package='robot_localization',
@@ -140,7 +150,7 @@ def launch_setup(context, *args, **kwargs):
             # FRAMES
             'base_link_frame': 'base_footprint',
             'odom_frame': 'odom',
-            'world_frame': 'odom',
+            'world_frame': world_frame,
 
             # OUTPUT
             'publish_tf': True,
@@ -149,6 +159,8 @@ def launch_setup(context, *args, **kwargs):
             'two_d_mode': True,
             'frequency': 50.0,
         }],
+        # Disable EKF when SLAM is enabled - SLAM will handle map->odom
+        condition=UnlessCondition(use_slam_config),
     )
 
     cmd_vel_relay = Node(
@@ -158,6 +170,18 @@ def launch_setup(context, *args, **kwargs):
             '/cmd_vel',
             '/ackermann_steering_controller/reference_unstamped'
         ],
+    )
+
+    # ── 7b. Odometry to TF broadcaster (when SLAM is enabled) ──
+    # Publishes odom -> base_footprint transform from raw odometry
+    # This replaces EKF when SLAM is running
+    odom_to_tf = Node(
+        package='robot_bringup',
+        executable='odometry_to_tf',
+        name='odometry_to_tf',
+        output='screen',
+        parameters=[{'use_sim_time': True}],
+        condition=IfCondition(use_slam_config),
     )
 
     # ── 8. RViz ────────────────────────────────────────────────
@@ -192,6 +216,8 @@ def generate_launch_description():
     return LaunchDescription([
         DeclareLaunchArgument("rviz",  default_value="true",
             description="Launch RViz2"),
+        DeclareLaunchArgument("use_slam", default_value="false",
+            description="Disable static map->odom when using SLAM"),
         DeclareLaunchArgument("world", default_value="",
             description="Path to SDF world"),
         DeclareLaunchArgument("x",     default_value="-2.74",
