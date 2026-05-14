@@ -51,26 +51,25 @@ ackermann_steering_controller:
     # Odometry & Frames
     base_frame_id: base_footprint
     odom_frame_id: odom
-    publish_odom: true
-    enable_odom_tf: true
+    enable_odom_tf: false
     
     # Stability
     use_stamped_vel: false
     publish_rate: 50.0
-    open_loop: true
+    open_loop: false
     reference_timeout: 0.5
 
     publish_limited_velocity: true
 
-    # linear:
-    #   x:
-    #     has_velocity_limits: true
-    #     max_velocity: 3.0
-    #     min_velocity: -3.0
-    # angular:
-    #   z:
-    #     has_velocity_limits: true
-    #     max_velocity: 1.0
+    linear:
+      x:
+        has_velocity_limits: true
+        max_velocity: 3.0
+        min_velocity: -3.0
+    angular:
+      z:
+        has_velocity_limits: true
+        max_velocity: 1.0
 
 
     # joints:

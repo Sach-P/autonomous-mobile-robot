@@ -5,6 +5,7 @@ from launch.actions import (
     DeclareLaunchArgument, TimerAction,
     OpaqueFunction, ExecuteProcess
 )
+from launch.conditions import UnlessCondition
 from launch.substitutions import LaunchConfiguration, Command
 from launch_ros.parameter_descriptions import ParameterValue
 from launch_ros.actions import Node
@@ -14,6 +15,8 @@ def launch_setup(context, *args, **kwargs):
     pkg = get_package_share_directory("rc_car_description")
 
     use_rviz  = LaunchConfiguration("rviz").perform(context)
+    use_slam_config = LaunchConfiguration("use_slam")
+    use_slam  = use_slam_config.perform(context)
     world_arg = LaunchConfiguration("world").perform(context)
     x_pos     = LaunchConfiguration("x").perform(context)
     y_pos     = LaunchConfiguration("y").perform(context)
@@ -73,8 +76,8 @@ def launch_setup(context, *args, **kwargs):
             "/ackermann_steering_controller/odometry@nav_msgs/msg/Odometry[ignition.msgs.Odometry",
             "/world/cat_robotics_world/pose/info@geometry_msgs/msg/PoseArray[ignition.msgs.Pose_V",
 
-            # 3D LiDAR — PointCloud2
-            '/lidar/points@sensor_msgs/msg/PointCloud2[ignition.msgs.PointCloudPacked',
+            # 2D LiDAR — LaserScan
+            '/scan@sensor_msgs/msg/LaserScan[ignition.msgs.LaserScan',
             # IMU
             '/imu/data@sensor_msgs/msg/Imu[ignition.msgs.IMU',
             # Camera image
@@ -109,68 +112,67 @@ def launch_setup(context, *args, **kwargs):
         )],
     )
 
-    # ── 6. Static TF: map -> odom ──────────────────────────────
+    # ── 6. Static TF: map -> odom (only when SLAM is disabled) ──
     map_to_odom = Node(
         package="tf2_ros",
         executable="static_transform_publisher",
         name="map_to_odom",
         arguments=["0", "0", "0", "0", "0", "0", "map", "odom"],
         parameters=[{"use_sim_time": True}],
+        condition=UnlessCondition(use_slam_config),
     )
 
-    # ── 7. Ground truth TF: odom -> base_footprint ─────────────
-    ground_truth_tf = ExecuteProcess(
-        cmd=["python3", "-c",
-"""
-import rclpy
-from rclpy.node import Node
-from geometry_msgs.msg import PoseArray, TransformStamped
-from tf2_ros import TransformBroadcaster
+    world_frame = 'odom'
 
-class GzTF(Node):
-    def __init__(self):
-        super().__init__('gz_ground_truth_tf')
-        self.br = TransformBroadcaster(self)
-        self.rc_car_index = None
-        self.create_subscription(PoseArray,
-            '/world/cat_robotics_world/pose/info', self.cb, 10)
+    ekf_node = Node(
+        package='robot_localization',
+        executable='ekf_node',
+        name='ekf_filter_node',
+        output='screen',
+        parameters=[{
+            'use_sim_time': True,
 
-    def cb(self, msg):
-        # Auto-detect rc_car index by finding the pose closest
-        # to spawn position (-2.74, -0.46) on first message
-        if self.rc_car_index is None:
-            best = None
-            best_dist = 9999
-            for i, p in enumerate(msg.poses):
-                d = ((p.position.x - (-2.74))**2 +
-                     (p.position.y - (-0.46))**2) ** 0.5
-                if d < best_dist:
-                    best_dist = d
-                    best = i
-            if best_dist < 1.0:
-                self.rc_car_index = best
-                self.get_logger().info(
-                    f'rc_car found at index {best} dist={best_dist:.3f}')
-            return
+            # INPUT
+            'odom0': '/ackermann_steering_controller/odometry',
 
-        if len(msg.poses) <= self.rc_car_index:
-            return
+            'odom0_config': [
+                True,  True,  False,   # x, y, z
+                False, False, True,    # roll, pitch, yaw
+                True,  True,  False,   # vx, vy, vz
+                False, False, True,    # vroll, vpitch, vyaw
+                False, False, False
+            ],
 
-        p = msg.poses[self.rc_car_index]
-        t = TransformStamped()
-        t.header.stamp = msg.header.stamp
-        t.header.frame_id = 'odom'
-        t.child_frame_id = 'base_footprint'
-        t.transform.translation.x = p.position.x
-        t.transform.translation.y = p.position.y
-        t.transform.translation.z = 0.0
-        t.transform.rotation = p.orientation
-        self.br.sendTransform(t)
+            'imu0': '/imu/data',
+            'imu0_config': [
+                False, False, False,   # x, y, z
+                True,  True,  True,    # roll, pitch, yaw
+                False, False, False,   # vx, vy, vz
+                False, False, False,   # vroll, vpitch, vyaw
+                False, False, False
+            ],
 
-rclpy.init()
-rclpy.spin(GzTF())
-"""],
-        output="screen",
+            # FRAMES
+            'base_link_frame': 'base_footprint',
+            'odom_frame': 'odom',
+            'world_frame': world_frame,
+
+            # OUTPUT
+            'publish_tf': True,
+
+            # SETTINGS
+            'two_d_mode': True,
+            'frequency': 50.0,
+        }],
+    )
+
+    cmd_vel_relay = Node(
+        package='topic_tools',
+        executable='relay',
+        arguments=[
+            '/cmd_vel',
+            '/ackermann_steering_controller/reference_unstamped'
+        ],
     )
 
     # ── 8. RViz ────────────────────────────────────────────────
@@ -191,8 +193,9 @@ rclpy.spin(GzTF())
         bridge,
         joint_state_broadcaster,
         ackermann_controller,
+        ekf_node,
         map_to_odom,
-        ground_truth_tf,
+        cmd_vel_relay,
     ]
     if use_rviz == "true":
         nodes.append(rviz_node)
@@ -204,6 +207,8 @@ def generate_launch_description():
     return LaunchDescription([
         DeclareLaunchArgument("rviz",  default_value="true",
             description="Launch RViz2"),
+        DeclareLaunchArgument("use_slam", default_value="false",
+            description="Disable static map->odom when using SLAM"),
         DeclareLaunchArgument("world", default_value="",
             description="Path to SDF world"),
         DeclareLaunchArgument("x",     default_value="-2.74",
