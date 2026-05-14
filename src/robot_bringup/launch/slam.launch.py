@@ -19,7 +19,7 @@ def generate_launch_description():
 
     include_sim = IncludeLaunchDescription(
         PythonLaunchDescriptionSource(
-            os.path.join(pkg_bringup, 'launch', 'rc_car_sim.launch.py')
+            os.path.join(pkg_bringup, 'launch', 'sim.launch.py')
         ),
         launch_arguments={
             'rviz': rviz,
