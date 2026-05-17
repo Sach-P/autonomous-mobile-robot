@@ -1,17 +1,16 @@
 Panels:
   - Class: rviz_common/Displays
+    Help Height: 70
     Name: Displays
     Property Tree Widget:
-      Expanded:
-        - /RobotModel1
-        - /PointCloud21
-        - /TF1
+      Expanded: ~
       Splitter Ratio: 0.5
-    Tree Height: 600
+    Tree Height: 168
   - Class: rviz_common/Views
+    Expanded:
+      - /Current View1
     Name: Views
     Splitter Ratio: 0.5
-
 Visualization Manager:
   Class: ""
   Displays:
@@ -21,41 +20,182 @@ Visualization Manager:
       Color: 160; 160; 164
       Enabled: true
       Line Style:
-        Line Width: 0.03
+        Line Width: 0.029999999329447746
         Value: Lines
       Name: Grid
       Normal Cell Count: 0
-      Offset: {X: 0, Y: 0, Z: 0}
+      Offset:
+        X: 0
+        Y: 0
+        Z: 0
       Plane: XY
       Plane Cell Count: 20
       Reference Frame: <Fixed Frame>
       Value: true
-
     - Alpha: 1
       Class: rviz_default_plugins/RobotModel
       Collision Enabled: false
+      Description File: ""
       Description Source: Topic
-      Description Topic: /robot_description
+      Description Topic:
+        Depth: 5
+        Durability Policy: Volatile
+        History Policy: Keep Last
+        Reliability Policy: Reliable
+        Value: /robot_description
       Enabled: true
+      Links:
+        All Links Enabled: true
+        Expand Joint Details: false
+        Expand Link Details: false
+        Expand Tree: false
+        Link Tree Style: Links in Alphabetic Order
+        base_footprint:
+          Alpha: 1
+          Show Axes: false
+          Show Trail: false
+        base_link:
+          Alpha: 1
+          Show Axes: false
+          Show Trail: false
+          Value: true
+        body_top:
+          Alpha: 1
+          Show Axes: false
+          Show Trail: false
+          Value: true
+        camera_link:
+          Alpha: 1
+          Show Axes: false
+          Show Trail: false
+          Value: true
+        camera_optical_link:
+          Alpha: 1
+          Show Axes: false
+          Show Trail: false
+        depth_camera_link:
+          Alpha: 1
+          Show Axes: false
+          Show Trail: false
+          Value: true
+        front_left_steer_link:
+          Alpha: 1
+          Show Axes: false
+          Show Trail: false
+          Value: true
+        front_left_wheel_link:
+          Alpha: 1
+          Show Axes: false
+          Show Trail: false
+          Value: true
+        front_right_steer_link:
+          Alpha: 1
+          Show Axes: false
+          Show Trail: false
+          Value: true
+        front_right_wheel_link:
+          Alpha: 1
+          Show Axes: false
+          Show Trail: false
+          Value: true
+        imu_link:
+          Alpha: 1
+          Show Axes: false
+          Show Trail: false
+          Value: true
+        lidar_link:
+          Alpha: 1
+          Show Axes: false
+          Show Trail: false
+          Value: true
+        rear_left_wheel_link:
+          Alpha: 1
+          Show Axes: false
+          Show Trail: false
+          Value: true
+        rear_right_wheel_link:
+          Alpha: 1
+          Show Axes: false
+          Show Trail: false
+          Value: true
+      Mass Properties:
+        Inertia: false
+        Mass: false
       Name: RobotModel
       TF Prefix: ""
       Update Interval: 0
       Value: true
       Visual Enabled: true
-
     - Class: rviz_default_plugins/TF
       Enabled: true
       Frame Timeout: 15
       Frames:
         All Enabled: true
-      Marker Scale: 0.2
+        base_footprint:
+          Value: true
+        base_link:
+          Value: true
+        body_top:
+          Value: true
+        camera_link:
+          Value: true
+        camera_optical_link:
+          Value: true
+        depth_camera_link:
+          Value: true
+        front_left_steer_link:
+          Value: true
+        front_left_wheel_link:
+          Value: true
+        front_right_steer_link:
+          Value: true
+        front_right_wheel_link:
+          Value: true
+        imu_link:
+          Value: true
+        lidar_link:
+          Value: true
+        map:
+          Value: true
+        odom:
+          Value: true
+        rear_left_wheel_link:
+          Value: true
+        rear_right_wheel_link:
+          Value: true
+      Marker Scale: 0.20000000298023224
       Name: TF
       Show Arrows: true
       Show Axes: true
       Show Names: true
+      Tree:
+        map:
+          odom:
+            base_footprint:
+              base_link:
+                body_top:
+                  {}
+                camera_link:
+                  camera_optical_link:
+                    {}
+                depth_camera_link:
+                  {}
+                front_left_steer_link:
+                  front_left_wheel_link:
+                    {}
+                front_right_steer_link:
+                  front_right_wheel_link:
+                    {}
+                imu_link:
+                  {}
+                lidar_link:
+                  {}
+                rear_left_wheel_link:
+                  {}
+                rear_right_wheel_link:
+                  {}
       Update Interval: 0
       Value: true
-
     - Alpha: 1
       Autocompute Intensity Bounds: true
       Autocompute Value Bounds:
@@ -64,54 +204,59 @@ Visualization Manager:
         Value: true
       Axis: Z
       Channel Name: intensity
-      Class: rviz_default_plugins/PointCloud2
-      Color: 255; 255; 255
+      Class: rviz_default_plugins/LaserScan
+      Color: 255; 255; 0
       Color Transformer: Intensity
       Decay Time: 0
       Enabled: true
       Invert Rainbow: false
       Max Color: 255; 255; 255
-      Max Intensity: 4096
+      Max Intensity: 0
       Min Color: 0; 0; 0
       Min Intensity: 0
-      Name: PointCloud2 (3D LiDAR)
+      Name: LaserScan
       Position Transformer: XYZ
       Selectable: true
       Size (Pixels): 3
-      Size (m): 0.02
-      Style: Points
+      Size (m): 0.009999999776482582
+      Style: FlatSquares
       Topic:
         Depth: 5
         Durability Policy: Volatile
+        Filter size: 10
         History Policy: Keep Last
-        Reliability Policy: Best Effort
-        Value: /lidar/points
+        Reliability Policy: Reliable
+        Value: /scan
       Use Fixed Frame: true
       Use rainbow: true
       Value: true
-
-    - Class: rviz_default_plugins/LaserScan
-      Alpha: 1
-      Color: 255; 255; 0
-      Enabled: true
-      Name: LaserScan
-      Size: 0.05
-      Style: FlatSquares
-      Topic:
-        Value: /scan
-      Value: true
-
-    - Class: rviz_default_plugins/Map
-      Alpha: 0.8
+    - Alpha: 0.800000011920929
+      Class: rviz_default_plugins/Map
+      Color Scheme: map
+      Draw Behind: false
       Enabled: true
       Name: Map
       Topic:
+        Depth: 5
+        Durability Policy: Volatile
+        Filter size: 10
+        History Policy: Keep Last
+        Reliability Policy: Reliable
         Value: /map
+      Update Topic:
+        Depth: 5
+        Durability Policy: Volatile
+        History Policy: Keep Last
+        Reliability Policy: Reliable
+        Value: /map_updates
+      Use Timestamp: false
       Value: true
-
-    - Class: rviz_default_plugins/Imu
+    - Box enabled: true
+      Class: rviz_default_plugins/Imu
       Enabled: true
+      Fixed Frame Yaw: false
       Name: IMU
+      Scale: 1
       Topic:
         Depth: 5
         Durability Policy: Volatile
@@ -119,11 +264,7 @@ Visualization Manager:
         Reliability Policy: Best Effort
         Value: /imu/data
       Value: true
-      Box enabled: true
-      Scale: 1
-      Fixed Frame Yaw: false
-
-    - Angle Tolerance: 0.1
+    - Angle Tolerance: 0.10000000149011612
       Class: rviz_default_plugins/Odometry
       Covariance:
         Orientation:
@@ -135,7 +276,7 @@ Visualization Manager:
           Scale: 1
           Value: true
         Position:
-          Alpha: 0.3
+          Alpha: 0.30000001192092896
           Color: 204; 51; 204
           Scale: 1
           Value: true
@@ -143,33 +284,87 @@ Visualization Manager:
       Enabled: true
       Keep: 30
       Name: Odometry
-      Position Tolerance: 0.1
+      Position Tolerance: 0.10000000149011612
       Shape:
         Alpha: 1
-        Axes Length: 0.3
-        Axes Radius: 0.03
+        Axes Length: 0.30000001192092896
+        Axes Radius: 0.029999999329447746
         Color: 204; 51; 204
-        Head Length: 0.07
-        Head Radius: 0.035
-        Shaft Length: 0.23
-        Shaft Radius: 0.015
+        Head Length: 0.07000000029802322
+        Head Radius: 0.03500000014901161
+        Shaft Length: 0.23000000417232513
+        Shaft Radius: 0.014999999664723873
         Value: Arrow
+      Topic:
+        Depth: 5
+        Durability Policy: Volatile
+        Filter size: 10
+        History Policy: Keep Last
+        Reliability Policy: Reliable
+        Value: /ackermann_steering_controller/odometry
+      Value: true
+    - Class: rviz_default_plugins/Image
+      Enabled: true
+      Max Value: 1
+      Median window: 5
+      Min Value: 0
+      Name: Camera
+      Normalize Range: true
       Topic:
         Depth: 5
         Durability Policy: Volatile
         History Policy: Keep Last
         Reliability Policy: Reliable
-        Value: /ackermann_steering_controller/odometry
-      Value: true
-
-    - Class: rviz_default_plugins/Image
-      Enabled: true
-      Name: Camera
-      Normalize Range: true
-      Topic:
         Value: /camera/image_raw
       Value: true
-
+    - Alpha: 1
+      Autocompute Intensity Bounds: true
+      Autocompute Value Bounds:
+        Max Value: 10
+        Min Value: -10
+        Value: true
+      Axis: Z
+      Channel Name: intensity
+      Class: rviz_default_plugins/PointCloud2
+      Color: 255; 255; 255
+      Color Transformer: RGB8
+      Decay Time: 0
+      Enabled: true
+      Invert Rainbow: false
+      Max Color: 255; 255; 255
+      Max Intensity: 4096
+      Min Color: 0; 0; 0
+      Min Intensity: 0
+      Name: PointCloud2
+      Position Transformer: XYZ
+      Selectable: true
+      Size (Pixels): 3
+      Size (m): 0.009999999776482582
+      Style: Points
+      Topic:
+        Depth: 5
+        Durability Policy: Volatile
+        Filter size: 10
+        History Policy: Keep Last
+        Reliability Policy: Reliable
+        Value: /depth_camera/depth_image/points
+      Use Fixed Frame: true
+      Use rainbow: true
+      Value: true
+    - Class: rviz_default_plugins/Image
+      Enabled: true
+      Max Value: 1
+      Median window: 5
+      Min Value: 0
+      Name: Image
+      Normalize Range: true
+      Topic:
+        Depth: 5
+        Durability Policy: Volatile
+        History Policy: Keep Last
+        Reliability Policy: Reliable
+        Value: /depth_camera/depth_image
+      Value: true
   Enabled: true
   Global Options:
     Background Color: 48; 48; 48
@@ -181,33 +376,65 @@ Visualization Manager:
     - Class: rviz_default_plugins/Select
     - Class: rviz_default_plugins/FocusCamera
     - Class: rviz_default_plugins/Measure
+      Line color: 128; 128; 0
     - Class: rviz_default_plugins/SetInitialPose
+      Covariance x: 0.25
+      Covariance y: 0.25
+      Covariance yaw: 0.06853891909122467
+      Topic:
+        Depth: 5
+        Durability Policy: Volatile
+        History Policy: Keep Last
+        Reliability Policy: Reliable
+        Value: initialpose
     - Class: rviz_default_plugins/PublishPoint
-
+      Single click: true
+      Topic:
+        Depth: 5
+        Durability Policy: Volatile
+        History Policy: Keep Last
+        Reliability Policy: Reliable
+        Value: /clicked_point
+  Transformation:
+    Current:
+      Class: rviz_default_plugins/TF
+  Value: true
   Views:
     Current:
       Class: rviz_default_plugins/Orbit
-      Distance: 3.0
+      Distance: 21.997488021850586
       Enable Stereo Rendering:
+        Stereo Eye Separation: 0.05999999865889549
+        Stereo Focal Distance: 1
+        Swap Stereo Eyes: false
         Value: false
-      Focal Point: {X: 0, Y: 0, Z: 0}
+      Focal Point:
+        X: 0
+        Y: 0
+        Z: 0
       Focal Shape Fixed Size: true
-      Focal Shape Size: 0.05
+      Focal Shape Size: 0.05000000074505806
       Invert Z Axis: false
       Name: Current View
-      Near Clip Distance: 0.01
-      Pitch: 0.55
+      Near Clip Distance: 0.009999999776482582
+      Pitch: 0.25479647517204285
       Target Frame: base_link
       Value: Orbit (rviz)
-      Yaw: 0.8
+      Yaw: 2.535001277923584
     Saved: ~
-
 Window Geometry:
+  Camera:
+    collapsed: false
   Displays:
     collapsed: false
   Height: 1000
   Hide Left Dock: false
   Hide Right Dock: false
+  Image:
+    collapsed: false
+  QMainWindow State: 000000ff00000000fd0000000100000000000001cb0000038afc0200000005fb0000000c00430061006d006500720061010000003f000000d30000002900fffffffb000000100044006900730070006c00610079007301000001180000012e000000cc00fffffffb0000000a00560069006500770073010000024c000000c5000000a900fffffffb0000000c00430061006d006500720061010000027e0000007e0000000000000000fb0000000a0049006d0061006700650100000317000000b20000002900ffffff0000046f0000038a00000004000000040000000800000008fc0000000100000002000000010000000a0054006f006f006c00730100000000ffffffff0000000000000000
+  Views:
+    collapsed: false
   Width: 1600
-  X: 0
-  Y: 0
+  X: 113
+  Y: 67

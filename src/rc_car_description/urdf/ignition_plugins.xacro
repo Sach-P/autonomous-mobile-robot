@@ -1,8 +1,6 @@
 <?xml version="1.0"?>
 <robot xmlns:xacro="http://www.ros.org/wiki/xacro">
 
-  <!-- Ignition Gazebo 6 (Fortress) plugin configuration -->
-
   <!-- ============================================================
        WHEEL CONTACT PROPERTIES
   ============================================================ -->
@@ -104,7 +102,6 @@
 
   <!-- ============================================================
        ROS2 CONTROL — Ignition Gazebo 6 plugin
-       Uses ign_ros2_control (Humble compatible)
   ============================================================ -->
   <gazebo>
     <!-- <plugin filename="gz_ros2_control-system" name="gz_ros2_control::GazeboSimROS2ControlPlugin"> -->
@@ -127,7 +124,6 @@
 
   <!-- ============================================================
        IMU SENSOR
-       Note: no XML comments inside sensor block — Gazebo 6 parser bug
   ============================================================ -->
   <gazebo reference="imu_link">
     <sensor name="imu_sensor" type="imu">
@@ -153,13 +149,11 @@
   </gazebo>
 
   <!-- ============================================================
-       2D LIDAR SENSOR (planar scan)
-       Simulates a single-layer laser scanner for Nav2/SLAM
-       Note: no XML comments inside sensor block — Gazebo 6 parser bug
+       2D LIDAR SENSOR
   ============================================================ -->
  <gazebo reference="lidar_link">
-    <sensor name="laser_2d" type="gpu_lidar"> <!-- Changed from ray to gpu_lidar -->
-      <gz_frame_id>lidar_link</gz_frame_id> <!-- Required for correct TF in ROS -->
+    <sensor name="laser_2d" type="gpu_lidar"> 
+      <gz_frame_id>lidar_link</gz_frame_id> 
       <update_rate>10</update_rate>
       <topic>scan</topic>
       <lidar>
@@ -182,18 +176,14 @@
   </gazebo>
 
   <!-- ============================================================
-       FRONT CAMERA SENSOR
-       Note: no XML comments inside sensor block — Gazebo 6 parser bug
+       FRONT CAMERA
   ============================================================ -->
   <gazebo reference="camera_link">
     <sensor name="front_camera" type="camera">
       <always_on>true</always_on>
       <update_rate>30</update_rate>
-      <visualize>false</visualize>
+      <visualize>true</visualize>
       <topic>/camera/image_raw</topic>
-      <!-- <plugin filename="libignition-gazebo-sensors-system.so"
-              name="ignition::gazebo::systems::Sensors">
-      </plugin> -->
       <camera>
         <horizontal_fov>1.047</horizontal_fov>
         <image>
@@ -210,6 +200,40 @@
           <mean>0.0</mean>
           <stddev>0.007</stddev>
         </noise>
+      </camera>
+    </sensor>
+  </gazebo>
+
+
+  <!-- ============================================================
+       DEPTH CAMERA
+  ============================================================ -->
+
+  <gazebo reference="depth_camera_link">
+    <sensor name="depth_camera" type="depth_camera">
+      <always_on>true</always_on>
+      <update_rate>30</update_rate>
+      <visualize>true</visualize>
+      <min_depth>0.1</min_depth>
+      <max_depth>100.0</max_depth>
+      <gz_frame_id>depth_camera_link</gz_frame_id>
+      <topic>/depth_camera/depth_image</topic>
+      <camera>
+        <horizontal_fov>1.047</horizontal_fov>
+        <image>
+          <width>640</width>
+          <height>480</height>
+          <format>R_FLOAT32</format>
+        </image>
+        <clip>
+          <near>0.1</near>
+          <far>15.0</far>
+        </clip>
+        <!-- <noise>
+          <type>gaussian</type>
+          <mean>0.0</mean>
+          <stddev>0.007</stddev>
+        </noise> -->
       </camera>
     </sensor>
   </gazebo>

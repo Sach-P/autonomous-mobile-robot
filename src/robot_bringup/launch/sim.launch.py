@@ -84,6 +84,11 @@ def launch_setup(context, *args, **kwargs):
             '/camera/image_raw@sensor_msgs/msg/Image[ignition.msgs.Image',
             # Camera info
             '/camera/camera_info@sensor_msgs/msg/CameraInfo[ignition.msgs.CameraInfo',
+
+
+            '/depth_camera/depth_image@sensor_msgs/msg/Image[ignition.msgs.Image',
+            '/depth_camera/camera_info@sensor_msgs/msg/CameraInfo[ignition.msgs.CameraInfo',
+            '/depth_camera/depth_image/points@sensor_msgs/msg/PointCloud2[ignition.msgs.PointCloudPacked',
         ],
         output="screen",
         parameters=[{"use_sim_time": True}],
