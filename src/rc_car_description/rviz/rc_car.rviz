@@ -3,9 +3,11 @@ Panels:
     Help Height: 70
     Name: Displays
     Property Tree Widget:
-      Expanded: ~
+      Expanded:
+        - /Global Options1
+        - /PointCloud21
       Splitter Ratio: 0.5
-    Tree Height: 168
+    Tree Height: 278
   - Class: rviz_common/Views
     Expanded:
       - /Current View1
@@ -78,6 +80,10 @@ Visualization Manager:
           Show Axes: false
           Show Trail: false
           Value: true
+        depth_camera_optical_link:
+          Alpha: 1
+          Show Axes: false
+          Show Trail: false
         front_left_steer_link:
           Alpha: 1
           Show Axes: false
@@ -143,6 +149,8 @@ Visualization Manager:
           Value: true
         depth_camera_link:
           Value: true
+        depth_camera_optical_link:
+          Value: true
         front_left_steer_link:
           Value: true
         front_left_wheel_link:
@@ -179,7 +187,8 @@ Visualization Manager:
                   camera_optical_link:
                     {}
                 depth_camera_link:
-                  {}
+                  depth_camera_optical_link:
+                    {}
                 front_left_steer_link:
                   front_left_wheel_link:
                     {}
@@ -234,7 +243,7 @@ Visualization Manager:
       Class: rviz_default_plugins/Map
       Color Scheme: map
       Draw Behind: false
-      Enabled: true
+      Enabled: false
       Name: Map
       Topic:
         Depth: 5
@@ -250,7 +259,7 @@ Visualization Manager:
         Reliability Policy: Reliable
         Value: /map_updates
       Use Timestamp: false
-      Value: true
+      Value: false
     - Box enabled: true
       Class: rviz_default_plugins/Imu
       Enabled: true
@@ -320,8 +329,8 @@ Visualization Manager:
     - Alpha: 1
       Autocompute Intensity Bounds: true
       Autocompute Value Bounds:
-        Max Value: 10
-        Min Value: -10
+        Max Value: 1.2181336879730225
+        Min Value: 0.05499602109193802
         Value: true
       Axis: Z
       Channel Name: intensity
@@ -338,7 +347,7 @@ Visualization Manager:
       Name: PointCloud2
       Position Transformer: XYZ
       Selectable: true
-      Size (Pixels): 3
+      Size (Pixels): 1
       Size (m): 0.009999999776482582
       Style: Points
       Topic:
@@ -364,6 +373,76 @@ Visualization Manager:
         History Policy: Keep Last
         Reliability Policy: Reliable
         Value: /depth_camera/depth_image
+      Value: true
+    - Alpha: 0.699999988079071
+      Class: rviz_default_plugins/Map
+      Color Scheme: costmap
+      Draw Behind: false
+      Enabled: true
+      Name: Map
+      Topic:
+        Depth: 5
+        Durability Policy: Volatile
+        Filter size: 10
+        History Policy: Keep Last
+        Reliability Policy: Reliable
+        Value: /local_costmap/costmap
+      Update Topic:
+        Depth: 5
+        Durability Policy: Volatile
+        History Policy: Keep Last
+        Reliability Policy: Reliable
+        Value: /local_costmap/costmap_updates
+      Use Timestamp: false
+      Value: true
+    - Alpha: 0.699999988079071
+      Class: rviz_default_plugins/Map
+      Color Scheme: costmap
+      Draw Behind: false
+      Enabled: true
+      Name: Map
+      Topic:
+        Depth: 5
+        Durability Policy: Volatile
+        Filter size: 10
+        History Policy: Keep Last
+        Reliability Policy: Reliable
+        Value: /global_costmap/costmap
+      Update Topic:
+        Depth: 5
+        Durability Policy: Volatile
+        History Policy: Keep Last
+        Reliability Policy: Reliable
+        Value: /global_costmap/costmap_updates
+      Use Timestamp: false
+      Value: true
+    - Alpha: 1
+      Buffer Length: 1
+      Class: rviz_default_plugins/Path
+      Color: 25; 255; 0
+      Enabled: true
+      Head Diameter: 0.30000001192092896
+      Head Length: 0.20000000298023224
+      Length: 0.30000001192092896
+      Line Style: Lines
+      Line Width: 0.029999999329447746
+      Name: Path
+      Offset:
+        X: 0
+        Y: 0
+        Z: 0
+      Pose Color: 255; 85; 255
+      Pose Style: None
+      Radius: 0.029999999329447746
+      Shaft Diameter: 0.10000000149011612
+      Shaft Length: 0.10000000149011612
+      Topic:
+        Depth: 5
+        Durability Policy: Volatile
+        Filter size: 10
+        History Policy: Keep Last
+        Reliability Policy: Reliable
+        Value: /plan
       Value: true
   Enabled: true
   Global Options:
@@ -395,6 +474,13 @@ Visualization Manager:
         History Policy: Keep Last
         Reliability Policy: Reliable
         Value: /clicked_point
+    - Class: rviz_default_plugins/SetGoal
+      Topic:
+        Depth: 5
+        Durability Policy: Volatile
+        History Policy: Keep Last
+        Reliability Policy: Reliable
+        Value: goal_pose
   Transformation:
     Current:
       Class: rviz_default_plugins/TF
@@ -402,39 +488,59 @@ Visualization Manager:
   Views:
     Current:
       Class: rviz_default_plugins/Orbit
-      Distance: 21.997488021850586
+      Distance: 18.507869720458984
       Enable Stereo Rendering:
         Stereo Eye Separation: 0.05999999865889549
         Stereo Focal Distance: 1
         Swap Stereo Eyes: false
         Value: false
       Focal Point:
-        X: 0
-        Y: 0
-        Z: 0
+        X: -0.19885076582431793
+        Y: 0.25725293159484863
+        Z: 0.040356870740652084
       Focal Shape Fixed Size: true
       Focal Shape Size: 0.05000000074505806
       Invert Z Axis: false
       Name: Current View
       Near Clip Distance: 0.009999999776482582
-      Pitch: 0.25479647517204285
+      Pitch: 0.9747966527938843
       Target Frame: base_link
       Value: Orbit (rviz)
-      Yaw: 2.535001277923584
-    Saved: ~
+      Yaw: 4.421815395355225
+    Saved:
+      - Class: rviz_default_plugins/Orbit
+        Distance: 6.859731197357178
+        Enable Stereo Rendering:
+          Stereo Eye Separation: 0.05999999865889549
+          Stereo Focal Distance: 1
+          Swap Stereo Eyes: false
+          Value: false
+        Focal Point:
+          X: 0
+          Y: 0
+          Z: 0
+        Focal Shape Fixed Size: true
+        Focal Shape Size: 0.05000000074505806
+        Invert Z Axis: false
+        Name: Orbit
+        Near Clip Distance: 0.009999999776482582
+        Pitch: 0.5247964262962341
+        Target Frame: base_link
+        Value: Orbit (rviz)
+        Yaw: 3.095001220703125
 Window Geometry:
   Camera:
     collapsed: false
   Displays:
     collapsed: false
-  Height: 1000
+  Height: 1043
   Hide Left Dock: false
   Hide Right Dock: false
   Image:
     collapsed: false
-  QMainWindow State: 000000ff00000000fd0000000100000000000001cb0000038afc0200000005fb0000000c00430061006d006500720061010000003f000000d30000002900fffffffb000000100044006900730070006c00610079007301000001180000012e000000cc00fffffffb0000000a00560069006500770073010000024c000000c5000000a900fffffffb0000000c00430061006d006500720061010000027e0000007e0000000000000000fb0000000a0049006d0061006700650100000317000000b20000002900ffffff0000046f0000038a00000004000000040000000800000008fc0000000100000002000000010000000a0054006f006f006c00730100000000ffffffff0000000000000000
+  QMainWindow State: 000000ff00000000fd00000001000000000000027a000003b5fc0200000005fb0000000a0049006d006100670065010000003f000000d60000002900fffffffb0000000c00430061006d006500720061010000011b0000006b0000002900fffffffb000000100044006900730070006c006100790073010000018c0000019c000000cc00fffffffb0000000a00560069006500770073010000032e000000c6000000a900fffffffb0000000c00430061006d006500720061010000027e0000007e000000000000000000000500000003b500000004000000040000000800000008fc0000000100000002000000010000000a0054006f006f006c00730100000000ffffffff0000000000000000
   Views:
     collapsed: false
-  Width: 1600
-  X: 113
-  Y: 67
+  Width: 1920
+  X: 1920
+  Y: 0

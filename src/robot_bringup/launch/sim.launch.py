@@ -147,6 +147,8 @@ def launch_setup(context, *args, **kwargs):
                 False, False, True,    # vroll, vpitch, vyaw
                 False, False, False
             ],
+            'odom0_queue_size': 10,
+            'odom0_differential': False,
 
             'imu0': '/imu/data',
             'imu0_config': [
@@ -156,6 +158,9 @@ def launch_setup(context, *args, **kwargs):
                 False, False, False,   # vroll, vpitch, vyaw
                 False, False, False
             ],
+            'imu0_queue_size': 10,
+            'imu0_differential': False,
+            'imu0_remove_gravitational_acceleration': True,
 
             # FRAMES
             'base_link_frame': 'base_footprint',
@@ -164,10 +169,12 @@ def launch_setup(context, *args, **kwargs):
 
             # OUTPUT
             'publish_tf': True,
+            'publish_acceleration': False,
 
             # SETTINGS
             'two_d_mode': True,
             'frequency': 50.0,
+            'sensor_timeout': 0.1,
         }],
     )
 
@@ -178,6 +185,7 @@ def launch_setup(context, *args, **kwargs):
             '/cmd_vel',
             '/ackermann_steering_controller/reference_unstamped'
         ],
+        parameters=[{'use_sim_time': True}],
     )
 
     # ── 8. RViz ────────────────────────────────────────────────
@@ -220,7 +228,7 @@ def generate_launch_description():
             description="Spawn X"),
         DeclareLaunchArgument("y",     default_value="-0.46",
             description="Spawn Y"),
-        DeclareLaunchArgument("z",     default_value="0.1",
+        DeclareLaunchArgument("z",     default_value="0",
             description="Spawn Z"),
         OpaqueFunction(function=launch_setup),
     ])

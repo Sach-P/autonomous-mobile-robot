@@ -4,7 +4,7 @@
   <!--
     RC Car URDF
     Steering: Ackermann — front wheels steer, rear wheels drive
-    Sensors:  IMU, 3D LiDAR, front camera
+    Sensors:  IMU, 3D LiDAR, front camera, depth camera
   -->
 
   <xacro:include filename="$(find rc_car_description)/urdf/materials.xacro"/>

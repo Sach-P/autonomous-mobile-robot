@@ -50,7 +50,7 @@ def generate_launch_description():
             description='Spawn X'),
         DeclareLaunchArgument('y', default_value='-0.46',
             description='Spawn Y'),
-        DeclareLaunchArgument('z', default_value='0.1',
+        DeclareLaunchArgument('z', default_value='0',
             description='Spawn Z'),
         include_sim,
         slam_toolbox,

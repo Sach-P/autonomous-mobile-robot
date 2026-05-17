@@ -193,7 +193,7 @@
         </image>
         <clip>
           <near>0.1</near>
-          <far>50.0</far>
+          <far>10.0</far>
         </clip>
         <noise>
           <type>gaussian</type>
@@ -229,11 +229,11 @@
           <near>0.1</near>
           <far>15.0</far>
         </clip>
-        <!-- <noise>
+        <noise>
           <type>gaussian</type>
           <mean>0.0</mean>
           <stddev>0.007</stddev>
-        </noise> -->
+        </noise>
       </camera>
     </sensor>
   </gazebo>
