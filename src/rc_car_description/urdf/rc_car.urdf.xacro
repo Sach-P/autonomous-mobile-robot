@@ -385,14 +385,14 @@
     <origin xyz="${chassis_length*0.45} 0 ${chassis_height*0.8}" rpy="0 0 0"/>
   </joint>
 
-  <!-- <link name="depth_camera_optical_link">
+  <link name="depth_camera_optical_link">
     <xacro:dummy_inertia/>
   </link>
   <joint name="depth_camera_optical_joint" type="fixed">
     <parent link="depth_camera_link"/>
     <child  link="depth_camera_optical_link"/>
     <origin xyz="0 0 0" rpy="${-pi/2} 0 ${-pi/2}"/>
-  </joint> -->
+  </joint>
 
 
 </robot>
