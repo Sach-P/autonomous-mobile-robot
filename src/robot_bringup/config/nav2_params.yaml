@@ -41,7 +41,7 @@ controller_server:
       allow_reversing: false
       use_rotate_to_heading: false
       rotate_to_heading_angular_vel: 1.8
-      max_angular_accel: 3.2
+      max_angular_accel: 1.0
 
 local_costmap:
   local_costmap:

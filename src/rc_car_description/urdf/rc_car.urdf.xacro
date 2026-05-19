@@ -17,17 +17,17 @@
   <xacro:property name="chassis_length"   value="0.40"/>
   <xacro:property name="chassis_width"    value="0.20"/>
   <xacro:property name="chassis_height"   value="0.08"/>
-  <xacro:property name="chassis_mass"     value="1.0"/>
+  <xacro:property name="chassis_mass"     value="3.0"/>
 
   <xacro:property name="wheel_radius"     value="0.055"/>
   <xacro:property name="wheel_width"      value="0.04"/>
-  <xacro:property name="wheel_mass"       value="0.20"/>
+  <xacro:property name="wheel_mass"       value="0.1"/>
 
   <xacro:property name="wheelbase"        value="0.26"/>
   <xacro:property name="track_width"      value="0.22"/>
   <xacro:property name="ground_clearance" value="0.055"/>
 
-  <xacro:property name="max_steer"        value="0.6"/>
+  <xacro:property name="max_steer"        value="0.75"/>
   <xacro:property name="hub_size"         value="0.02"/>
   <xacro:property name="hub_mass"         value="0.05"/>
 
@@ -87,7 +87,7 @@
   ============================================================ -->
   <link name="base_link">
     <inertial>
-      <origin xyz="0 0 ${chassis_height/2}" rpy="0 0 0"/>
+      <origin xyz="0 0 0" rpy="0 0 0"/>
       <mass value="${chassis_mass}"/>
       <inertia
         ixx="${chassis_mass*(chassis_width*chassis_width+chassis_height*chassis_height)/12}"
@@ -98,7 +98,7 @@
     </inertial>
     <visual>
       <origin xyz="0 0 ${chassis_height/2}" rpy="0 0 0"/>
-      <geometry><box size="${chassis_length} ${chassis_width} ${chassis_height}"/></geometry>
+      <geometry><box size="${chassis_length} 0.1 ${chassis_height}"/></geometry>
       <material name="blue"/>
     </visual>
     <collision>
@@ -157,8 +157,8 @@
     <child  link="front_left_steer_link"/>
     <origin xyz="${front_x} ${axle_y} ${axle_z}" rpy="0 0 0"/>
     <axis xyz="0 0 1"/>
-    <limit lower="${-max_steer}" upper="${max_steer}" effort="10.0" velocity="5.0"/>
-    <dynamics damping="0.5" friction="0.1"/>
+    <limit lower="${-max_steer}" upper="${max_steer}" effort="50.0" velocity="5.0"/>
+    <dynamics damping="0.01" friction="0.0"/>
   </joint>
 
   <link name="front_right_steer_link">
@@ -184,8 +184,8 @@
     <child  link="front_right_steer_link"/>
     <origin xyz="${front_x} ${-axle_y} ${axle_z}" rpy="0 0 0"/>
     <axis xyz="0 0 1"/>
-    <limit lower="${-max_steer}" upper="${max_steer}" effort="10.0" velocity="5.0"/>
-    <dynamics damping="0.5" friction="0.1"/>
+    <limit lower="${-max_steer}" upper="${max_steer}" effort="50.0" velocity="5.0"/>
+    <dynamics damping="0.01" friction="0.0"/>
   </joint>
 
   <!-- ============================================================
@@ -252,9 +252,9 @@
   <joint name="rear_left_wheel_joint" type="continuous">
     <parent link="base_link"/>
     <child  link="rear_left_wheel_link"/>
-    <origin xyz="${rear_x} ${axle_y+wheel_width/2} ${axle_z}" rpy="0 0 0"/>
+    <origin xyz="${rear_x} ${axle_y + hub_size/2 + wheel_width/2} ${axle_z}" rpy="0 0 0"/>
     <axis xyz="0 1 0"/>
-    <dynamics damping="0.01" friction="0.1"/>
+    <dynamics damping="0.0" friction="0.0"/>
   </joint>
 
   <link name="rear_right_wheel_link">
@@ -281,9 +281,9 @@
   <joint name="rear_right_wheel_joint" type="continuous">
     <parent link="base_link"/>
     <child  link="rear_right_wheel_link"/>
-    <origin xyz="${rear_x} ${-(axle_y+wheel_width/2)} ${axle_z}" rpy="0 0 0"/>
+    <origin xyz="${rear_x} ${-(axle_y + hub_size/2 + wheel_width/2)} ${axle_z}" rpy="0 0 0"/>
     <axis xyz="0 1 0"/>
-    <dynamics damping="0.01" friction="0.1"/>
+    <dynamics damping="0.0" friction="0.0"/>
   </joint>
 
   <!-- ============================================================

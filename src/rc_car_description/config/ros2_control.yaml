@@ -1,6 +1,6 @@
 controller_manager:
   ros__parameters:
-    update_rate: 1000
+    update_rate: 100
     use_sim_time: true
 
     ackermann_steering_controller:
@@ -39,14 +39,14 @@ ackermann_steering_controller:
 
     # Kinematics - Humble version requires these specific keys
     wheelbase: 0.26
-    front_wheel_track: 0.22
-    rear_wheel_track: 0.22
+    front_wheel_track: 0.28
+    rear_wheel_track: 0.28
     front_wheels_radius: 0.055  # Changed from wheel_radius
     rear_wheels_radius: 0.055   # Changed from wheel_radius
 
     # Limits
-    max_steer: 1.5
-    min_steer: -1.5
+    max_steer: 0.75
+    min_steer: -0.75
     
     # Odometry & Frames
     base_frame_id: base_footprint
