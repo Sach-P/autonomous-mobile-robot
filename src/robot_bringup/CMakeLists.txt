@@ -27,4 +27,10 @@ install(DIRECTORY launch config
   DESTINATION share/${PROJECT_NAME}
 )
 
+install(PROGRAMS
+  scripts/log_pose_odom.py
+  scripts/broadcast_odom_tf.py
+  DESTINATION lib/${PROJECT_NAME}
+)
+
 ament_package()

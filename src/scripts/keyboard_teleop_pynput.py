@@ -62,10 +62,11 @@ class KeyboardTeleop:
             self.speed = -self.max_speed
         
         # Check steering keys
+        # In Ackermann steering: positive angle = left, negative = right
         if 'a' in self.keys_pressed or 'A' in self.keys_pressed or keyboard.Key.left in self.keys_pressed:
-            self.steer = self.max_steer if self.speed >= 0 else -self.max_steer
+            self.steer = -self.max_steer if self.speed >= 0 else self.max_steer  # Turn left (negative for Ackermann)
         elif 'd' in self.keys_pressed or 'D' in self.keys_pressed or keyboard.Key.right in self.keys_pressed:
-            self.steer = -self.max_steer if self.speed >= 0 else self.max_steer
+            self.steer = self.max_steer if self.speed >= 0 else -self.max_steer   # Turn right (positive for Ackermann)
         
         # Emergency stop
         if ' ' in self.keys_pressed:

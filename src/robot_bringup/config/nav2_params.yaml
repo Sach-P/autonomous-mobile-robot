@@ -7,7 +7,7 @@ bt_navigator:
     use_sim_time: true
     global_frame: map
     robot_base_frame: base_footprint
-    odom_topic: /odometry/filtered
+    odom_topic: /model/rc_car/odometry
 
 planner_server:
   ros__parameters:
@@ -23,25 +23,25 @@ controller_server:
   ros__parameters:
     use_sim_time: true
     controller_frequency: 20.0
-    odom_topic: /odometry/filtered
+    odom_topic: /model/rc_car/odometry
     controller_plugins: ["FollowPath"]
     FollowPath:
       plugin: "nav2_regulated_pure_pursuit_controller::RegulatedPurePursuitController"
-      desired_linear_vel: 1.5
-      lookahead_dist: 0.6
-      min_lookahead_dist: 0.3
-      max_lookahead_dist: 0.9
-      lookahead_time: 1.5
+      desired_linear_vel: 0.5
+      lookahead_dist: 0.9
+      min_lookahead_dist: 0.6
+      max_lookahead_dist: 1.2
+      lookahead_time: 2.0
       use_velocity_scaled_lookahead_dist: true
       min_approach_linear_velocity: 0.05
       use_regulated_linear_velocity_scaling: true
-      use_cost_regulated_linear_velocity_scaling: false
+      use_cost_regulated_linear_velocity_scaling: true
       regulated_linear_scaling_min_radius: 0.9
       regulated_linear_scaling_min_speed: 0.25
       allow_reversing: false
       use_rotate_to_heading: false
       rotate_to_heading_angular_vel: 1.8
-      max_angular_accel: 1.0
+      max_angular_accel: 0.8
 
 local_costmap:
   local_costmap:
@@ -114,13 +114,14 @@ global_costmap:
 
       use_sim_time: true
 
+      robot_radius: 0.2
       global_frame: map
       robot_base_frame: base_footprint
 
       update_frequency: 5.0
       publish_frequency: 2.0
 
-      plugins: ["static_layer", "obstacle_layer", "inflation_layer"]
+      plugins: ["static_layer", "obstacle_layer", "voxel_layer", "inflation_layer"]
 
       static_layer:
         plugin: "nav2_costmap_2d::StaticLayer"
@@ -136,6 +137,27 @@ global_costmap:
           data_type: LaserScan
           clearing: true
           marking: true
+          max_obstacle_height: 2.0
+          min_obstacle_height: 0.0
+
+      voxel_layer:
+        plugin: "nav2_costmap_2d::VoxelLayer"
+        enabled: true
+        publish_voxel_map: true
+        origin_z: 0.0
+        z_resolution: 0.05
+        z_voxels: 16
+        max_obstacle_height: 2.0
+        observation_sources: depth_cloud
+        depth_cloud:
+          topic: /depth_camera/depth_image/points
+          data_type: PointCloud2
+          marking: true
+          clearing: false
+          max_obstacle_height: 2.0
+          min_obstacle_height: 0.1
+          obstacle_max_range: 2.5
+          raytrace_max_range: 3.0
 
       inflation_layer:
         plugin: "nav2_costmap_2d::InflationLayer"

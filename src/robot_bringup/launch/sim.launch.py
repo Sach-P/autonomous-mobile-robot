@@ -73,7 +73,13 @@ def launch_setup(context, *args, **kwargs):
         arguments=[
             "/clock@rosgraph_msgs/msg/Clock[ignition.msgs.Clock",
             "/imu/data@sensor_msgs/msg/Imu[ignition.msgs.IMU",
-            "/ackermann_steering_controller/odometry@nav_msgs/msg/Odometry[ignition.msgs.Odometry",
+            # keep Gazebo truth odom on its own topic to avoid colliding with controller odom
+            "/model/rc_car/odometry@nav_msgs/msg/Odometry[ignition.msgs.Odometry",
+            "/model/rc_car/cmd_vel@geometry_msgs/msg/Twist]ignition.msgs.Twist",
+            # model pose mapping for direct rc_car chassis pose
+            "/model/rc_car/pose@geometry_msgs/msg/Pose[ignition.msgs.Pose",
+            # map Ignition dynamic_pose (per-entity poses) into ROS PoseArray for reliable chassis sampling
+            "/world/cat_robotics_world/dynamic_pose/info@geometry_msgs/msg/PoseArray[ignition.msgs.Pose_V",
             "/world/cat_robotics_world/pose/info@geometry_msgs/msg/PoseArray[ignition.msgs.Pose_V",
 
             # 2D LiDAR — LaserScan
@@ -106,17 +112,6 @@ def launch_setup(context, *args, **kwargs):
         )],
     )
 
-    ackermann_controller = TimerAction(
-        period=8.0,
-        actions=[Node(
-            package="controller_manager",
-            executable="spawner",
-            arguments=["ackermann_steering_controller",
-                       "--controller-manager", "/controller_manager"],
-            output="screen",
-        )],
-    )
-
     # ── 6. Static TF: map -> odom (only when SLAM is disabled) ──
     map_to_odom = Node(
         package="tf2_ros",
@@ -138,7 +133,7 @@ def launch_setup(context, *args, **kwargs):
             'use_sim_time': True,
 
             # INPUT
-            'odom0': '/ackermann_steering_controller/odometry',
+            'odom0': '/model/rc_car/odometry',
 
             'odom0_config': [
                 True,  True,  False,   # x, y, z
@@ -168,7 +163,7 @@ def launch_setup(context, *args, **kwargs):
             'world_frame': world_frame,
 
             # OUTPUT
-            'publish_tf': True,
+            'publish_tf': False,
             'publish_acceleration': False,
 
             # SETTINGS
@@ -183,8 +178,24 @@ def launch_setup(context, *args, **kwargs):
         executable='relay',
         arguments=[
             '/cmd_vel',
-            '/ackermann_steering_controller/reference_unstamped'
+            '/model/rc_car/cmd_vel'
         ],
+        parameters=[{'use_sim_time': True}],
+    )
+
+    odom_tf_broadcaster = Node(
+        package='robot_bringup',
+        executable='broadcast_odom_tf.py',
+        output='screen',
+        parameters=[{'use_sim_time': True}],
+    )
+
+    pose_odom_logger = Node(
+        package='robot_bringup',
+        executable='log_pose_odom.py',
+        name='pose_odom_logger',
+        output='screen',
+        arguments=['--output', '/tmp/odom_pose_sync.csv'],
         parameters=[{'use_sim_time': True}],
     )
 
@@ -205,10 +216,10 @@ def launch_setup(context, *args, **kwargs):
         spawn,
         bridge,
         joint_state_broadcaster,
-        ackermann_controller,
         ekf_node,
         map_to_odom,
         cmd_vel_relay,
+        odom_tf_broadcaster,
     ]
     if use_rviz == "true":
         nodes.append(rviz_node)
