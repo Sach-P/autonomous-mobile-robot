@@ -8,21 +8,21 @@
       <real_time_update_rate>1000</real_time_update_rate>
     </physics>
 
-    <!-- Required Ignition Gazebo 6 plugins -->
-    <plugin filename="libignition-gazebo-physics-system.so"
-            name="ignition::gazebo::systems::Physics"/>
-    <plugin filename="libignition-gazebo-user-commands-system.so"
-            name="ignition::gazebo::systems::UserCommands"/>
-    <plugin filename="libignition-gazebo-scene-broadcaster-system.so"
-            name="ignition::gazebo::systems::SceneBroadcaster"/>
-    <plugin filename="libignition-gazebo-sensors-system.so"
-            name="ignition::gazebo::systems::Sensors">
+    <!-- Required Gazebo Harmonic plugins -->
+    <plugin filename="gz-sim8-physics-system"
+            name="gz::sim::systems::Physics"/>
+    <plugin filename="gz-sim8-user-commands-system"
+            name="gz::sim::systems::UserCommands"/>
+    <plugin filename="gz-sim8-scene-broadcaster-system"
+            name="gz::sim::systems::SceneBroadcaster"/>
+    <plugin filename="gz-sim8-sensors-system"
+            name="gz::sim::systems::Sensors">
       <render_engine>ogre</render_engine>
     </plugin>
-    <plugin filename="libignition-gazebo-imu-system.so"
-            name="ignition::gazebo::systems::Imu"/>
-    <plugin filename="libignition-gazebo-contact-system.so"
-            name="ignition::gazebo::systems::Contact"/>
+    <plugin filename="gz-sim8-imu-system"
+            name="gz::sim::systems::Imu"/>
+    <plugin filename="gz-sim8-contact-system"
+            name="gz::sim::systems::Contact"/>
 
     <scene>
       <ambient>0.6 0.6 0.6 1</ambient>

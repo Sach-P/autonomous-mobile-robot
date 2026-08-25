@@ -26,33 +26,34 @@ def generate_launch_description():
         default_value='true'
     )
 
+
+
+
     slam = IncludeLaunchDescription(
         PythonLaunchDescriptionSource(
             os.path.join(pkg_bringup, 'launch', 'slam.launch.py')
         ),
     )
 
-    # -------------------------
-    # Nav2 bringup
-    # -------------------------
-    nav2 = IncludeLaunchDescription(
-        PythonLaunchDescriptionSource(
-            os.path.join(
-                get_package_share_directory('nav2_bringup'),
-                'launch',
-                'navigation_launch.py'
+    nav2 = TimerAction(
+        period = 4.0,
+
+        actions=[
+            IncludeLaunchDescription(
+                PythonLaunchDescriptionSource(
+                    os.path.join(pkg_bringup, 'launch', 'nav2_navigation.launch.py')
+                ),
+                launch_arguments={
+                    'use_sim_time': use_sim_time,
+                    'params_file': os.path.join(
+                    pkg_bringup,
+                    'config',
+                    'nav2_params.yaml')
+                }.items()
             )
-        ),
-        launch_arguments={
-            'use_sim_time': use_sim_time,
-            'params_file': os.path.join(
-            pkg_bringup,
-            'config',
-            'nav2_params.yaml')
-        }.items()
+        ],
     )
 
- 
 
 
 

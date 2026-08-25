@@ -17,31 +17,51 @@ planner_server:
     planner_plugins: ["GridBased"]
 
     GridBased:
-      plugin: "nav2_navfn_planner/NavfnPlanner"
+      plugin: "nav2_navfn_planner::NavfnPlanner"
 
 controller_server:
   ros__parameters:
     use_sim_time: true
     controller_frequency: 20.0
+    min_x_velocity_threshold: 0.02
+    min_theta_velocity_threshold: 0.04
     odom_topic: /model/rc_car/odometry
     controller_plugins: ["FollowPath"]
     FollowPath:
       plugin: "nav2_regulated_pure_pursuit_controller::RegulatedPurePursuitController"
-      desired_linear_vel: 0.5
-      lookahead_dist: 0.9
+      desired_linear_vel: 0.35
+      lookahead_dist: 0.95
       min_lookahead_dist: 0.6
-      max_lookahead_dist: 1.2
-      lookahead_time: 2.0
+      max_lookahead_dist: 1.5
+      lookahead_time: 1.8
       use_velocity_scaled_lookahead_dist: true
       min_approach_linear_velocity: 0.05
       use_regulated_linear_velocity_scaling: true
       use_cost_regulated_linear_velocity_scaling: true
-      regulated_linear_scaling_min_radius: 0.9
-      regulated_linear_scaling_min_speed: 0.25
+      regulated_linear_scaling_min_radius: 0.45
+      regulated_linear_scaling_min_speed: 0.2
       allow_reversing: false
       use_rotate_to_heading: false
       rotate_to_heading_angular_vel: 1.8
-      max_angular_accel: 0.8
+      max_angular_accel: 0.6
+      max_robot_pose_search_dist: 2.0
+      use_interpolation: true
+
+velocity_smoother:
+  ros__parameters:
+    use_sim_time: true
+    smoothing_frequency: 20.0
+    stamp_smoothed_velocity_with_smoothing_time: false
+    scale_velocities: false
+    feedback: "OPEN_LOOP"
+    max_velocity: [0.35, 0.0, 1.0]
+    min_velocity: [-0.35, 0.0, -1.0]
+    max_accel: [1.8, 0.0, 2.0]
+    max_decel: [-1.8, 0.0, -2.0]
+    odom_topic: "/model/rc_car/odometry"
+    odom_duration: 0.1
+    deadband_velocity: [0.03, 0.0, 0.06]
+    velocity_timeout: 1.0
 
 local_costmap:
   local_costmap:
@@ -55,11 +75,14 @@ local_costmap:
 
       update_frequency: 10.0
       publish_frequency: 5.0
+      always_send_full_costmap: true
 
       rolling_window: true
       width: 6
       height: 6
       resolution: 0.05
+
+      transform_tolerance: 1.0
 
       plugins: ["obstacle_layer", "voxel_layer", "inflation_layer"]
 
@@ -120,6 +143,9 @@ global_costmap:
 
       update_frequency: 5.0
       publish_frequency: 2.0
+      always_send_full_costmap: true
+
+      transform_tolerance: 1.0
 
       plugins: ["static_layer", "obstacle_layer", "voxel_layer", "inflation_layer"]
 
@@ -174,17 +200,44 @@ behavior_server:
     cycle_frequency: 10.0
     behavior_plugins: ["spin", "backup", "wait"]
     spin:
-      plugin: "nav2_behaviors/Spin"
+      plugin: "nav2_behaviors::Spin"
     backup:
-      plugin: "nav2_behaviors/BackUp"
+      plugin: "nav2_behaviors::BackUp"
     wait:
-      plugin: "nav2_behaviors/Wait"
+      plugin: "nav2_behaviors::Wait"
 
 waypoint_follower:
   ros__parameters:
     use_sim_time: true
     loop_rate: 20
     stop_on_failure: false
+
+collision_monitor:
+  ros__parameters:
+    use_sim_time: true
+    base_frame_id: "base_footprint"
+    odom_frame_id: "odom"
+    cmd_vel_in_topic: "cmd_vel_smoothed"
+    cmd_vel_out_topic: "cmd_vel"
+    state_topic: "collision_monitor_state"
+    transform_tolerance: 0.5
+    source_timeout: 5.0
+    base_shift_correction: true
+    stop_pub_timeout: 2.0
+    polygons: ["PolygonStop"]
+    PolygonStop:
+      type: "polygon"
+      points: "[[0.3, 0.3], [0.3, -0.3], [-0.3, -0.3], [-0.3, 0.3]]"
+      action_type: "stop"
+      min_points: 4
+      visualize: true
+      polygon_pub_topic: "polygon_stop"
+      enabled: true
+    observation_sources: ["scan"]
+    scan:
+      type: "scan"
+      topic: "/scan"
+      enabled: true
 
 lifecycle_manager:
   ros__parameters:

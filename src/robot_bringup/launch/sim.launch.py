@@ -36,21 +36,29 @@ def launch_setup(context, *args, **kwargs):
         executable="robot_state_publisher",
         name="robot_state_publisher",
         output="screen",
-        parameters=[
-            {"robot_description": robot_description},
-            {"use_sim_time": True},
-        ],
+        parameters=[{
+            "robot_description": robot_description,
+            "use_sim_time": True,
+        }],
     )
 
     # ── 2. Gazebo ──────────────────────────────────────────────
+    # gz sim only searches GZ_SIM_SYSTEM_PLUGIN_PATH for system plugins
+    # (e.g. gz_ros2_control), so reuse LD_LIBRARY_PATH which already
+    # contains /opt/ros/<distro>/lib where the .so files are installed.
+    gz_plugin_path = os.pathsep.join(filter(None, [
+        os.environ.get("GZ_SIM_SYSTEM_PLUGIN_PATH", ""),
+        os.environ.get("LD_LIBRARY_PATH", ""),
+    ]))
     gazebo = ExecuteProcess(
-        cmd=["ign", "gazebo", "--verbose", "-r", world_path],
+        cmd=["gz", "sim", "-v", "4", "-r", world_path],
         output="screen",
+        additional_env={"GZ_SIM_SYSTEM_PLUGIN_PATH": gz_plugin_path},
     )
 
-    # ── 3. Spawn robot (delayed 3s for Gazebo to start) ────────
+    # ── 3. Spawn robot (delayed for Gazebo to start) ────────────
     spawn = TimerAction(
-        period=3.0,
+        period=1.5,
         actions=[Node(
             package="ros_gz_sim",
             executable="create",
@@ -62,6 +70,7 @@ def launch_setup(context, *args, **kwargs):
                 "-z", z_pos,
             ],
             output="screen",
+            parameters=[{"use_sim_time": True}],
         )],
     )
 
@@ -71,30 +80,30 @@ def launch_setup(context, *args, **kwargs):
         executable="parameter_bridge",
         name="ros_gz_bridge",
         arguments=[
-            "/clock@rosgraph_msgs/msg/Clock[ignition.msgs.Clock",
-            "/imu/data@sensor_msgs/msg/Imu[ignition.msgs.IMU",
+            "/clock@rosgraph_msgs/msg/Clock[gz.msgs.Clock",
+            "/imu/data@sensor_msgs/msg/Imu[gz.msgs.IMU",
             # keep Gazebo truth odom on its own topic to avoid colliding with controller odom
-            "/model/rc_car/odometry@nav_msgs/msg/Odometry[ignition.msgs.Odometry",
-            "/model/rc_car/cmd_vel@geometry_msgs/msg/Twist]ignition.msgs.Twist",
+            "/model/rc_car/odometry@nav_msgs/msg/Odometry[gz.msgs.Odometry",
+            "/model/rc_car/cmd_vel@geometry_msgs/msg/Twist]gz.msgs.Twist",
             # model pose mapping for direct rc_car chassis pose
-            "/model/rc_car/pose@geometry_msgs/msg/Pose[ignition.msgs.Pose",
-            # map Ignition dynamic_pose (per-entity poses) into ROS PoseArray for reliable chassis sampling
-            "/world/cat_robotics_world/dynamic_pose/info@geometry_msgs/msg/PoseArray[ignition.msgs.Pose_V",
-            "/world/cat_robotics_world/pose/info@geometry_msgs/msg/PoseArray[ignition.msgs.Pose_V",
+            "/model/rc_car/pose@geometry_msgs/msg/Pose[gz.msgs.Pose",
+            # map Gazebo dynamic_pose (per-entity poses) into ROS PoseArray for reliable chassis sampling
+            "/world/cat_robotics_world/dynamic_pose/info@geometry_msgs/msg/PoseArray[gz.msgs.Pose_V",
+            "/world/cat_robotics_world/pose/info@geometry_msgs/msg/PoseArray[gz.msgs.Pose_V",
+            # joint states
+            "/joint_states@sensor_msgs/msg/JointState[gz.msgs.Model",
+
 
             # 2D LiDAR — LaserScan
-            '/scan@sensor_msgs/msg/LaserScan[ignition.msgs.LaserScan',
-            # IMU
-            '/imu/data@sensor_msgs/msg/Imu[ignition.msgs.IMU',
+            '/scan@sensor_msgs/msg/LaserScan[gz.msgs.LaserScan',
             # Camera image
-            '/camera/image_raw@sensor_msgs/msg/Image[ignition.msgs.Image',
+            '/camera/image_raw@sensor_msgs/msg/Image[gz.msgs.Image',
             # Camera info
-            '/camera/camera_info@sensor_msgs/msg/CameraInfo[ignition.msgs.CameraInfo',
-
-
-            '/depth_camera/depth_image@sensor_msgs/msg/Image[ignition.msgs.Image',
-            '/depth_camera/camera_info@sensor_msgs/msg/CameraInfo[ignition.msgs.CameraInfo',
-            '/depth_camera/depth_image/points@sensor_msgs/msg/PointCloud2[ignition.msgs.PointCloudPacked',
+            '/camera/camera_info@sensor_msgs/msg/CameraInfo[gz.msgs.CameraInfo',
+            # Depth camera streams
+            '/depth_camera/depth_image@sensor_msgs/msg/Image[gz.msgs.Image',
+            '/depth_camera/camera_info@sensor_msgs/msg/CameraInfo[gz.msgs.CameraInfo',
+            '/depth_camera/depth_image/points@sensor_msgs/msg/PointCloud2[gz.msgs.PointCloudPacked',
         ],
         output="screen",
         parameters=[{"use_sim_time": True}],
@@ -102,13 +111,14 @@ def launch_setup(context, *args, **kwargs):
 
     # ── 5. Controllers ─────────────────────────────────────────
     joint_state_broadcaster = TimerAction(
-        period=6.0,
+        period=3.5,
         actions=[Node(
             package="controller_manager",
             executable="spawner",
             arguments=["joint_state_broadcaster",
                        "--controller-manager", "/controller_manager"],
             output="screen",
+            parameters=[{"use_sim_time": True}],
         )],
     )
 

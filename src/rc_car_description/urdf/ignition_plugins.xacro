@@ -101,16 +101,18 @@
   </gazebo>
 
   <!-- ============================================================
-       ROS2 CONTROL — Ignition Gazebo 6 plugin
+       ROS2 CONTROL — Gazebo Harmonic plugin
   ============================================================ -->
   <gazebo>
-    <!-- <plugin filename="gz_ros2_control-system" name="gz_ros2_control::GazeboSimROS2ControlPlugin"> -->
-    <plugin name="ign_ros2_control::IgnitionROS2ControlPlugin" filename="libign_ros2_control-system.so">
+    <!-- <plugin name="gz_ros2_control::GazeboSimROS2ControlPlugin" filename="libgz_ros2_control-system.so">
       <parameters>$(find rc_car_description)/config/ros2_control.yaml</parameters>
-    </plugin>
+    </plugin> -->
     <plugin
-      filename="ignition-gazebo6-ackermann-steering-system"
-      name="ignition::gazebo::systems::AckermannSteering">
+      filename="gz-sim8-ackermann-steering-system"
+      name="gz::sim::systems::AckermannSteering">
+      <topic>/model/rc_car/cmd_vel</topic> <!-- Maps the command directly inside Gazebo -->
+      <odom_topic>/model/rc_car/odometry</odom_topic>
+      <tf_topic>/model/rc_car/tf</tf_topic>
       <left_joint>front_left_wheel_joint</left_joint>
       <left_joint>rear_left_wheel_joint</left_joint>
       <right_joint>front_right_wheel_joint</right_joint>
@@ -126,6 +128,15 @@
       <max_velocity>3.0</max_velocity>
       <min_acceleration>-5.0</min_acceleration>
       <max_acceleration>5.0</max_acceleration>
+    </plugin>
+    <plugin filename="gz-sim-joint-state-publisher-system" name="gz::sim::systems::JointStatePublisher">
+      <topic>/joint_states</topic>
+      <joint_name>front_left_steer_joint</joint_name>
+      <joint_name>front_right_steer_joint</joint_name>
+      <joint_name>front_left_wheel_joint</joint_name>
+      <joint_name>front_right_wheel_joint</joint_name>
+      <joint_name>rear_left_wheel_joint</joint_name>
+      <joint_name>rear_right_wheel_joint</joint_name>
     </plugin>
   </gazebo>
 
@@ -150,8 +161,8 @@
       <update_rate>100</update_rate>
       <visualize>false</visualize>
       <topic>/imu/data</topic>
-      <plugin filename="libignition-gazebo-imu-system.so"
-              name="ignition::gazebo::systems::Imu"/>
+      <plugin filename="gz-sim8-imu-system"
+              name="gz::sim::systems::Imu"/>
       <imu>
         <angular_velocity>
           <x><noise type="gaussian"><mean>0</mean><stddev>0.0001</stddev></noise></x>
