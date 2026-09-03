@@ -27,7 +27,7 @@ planner_server:
       max_planning_time: 5.0
       motion_model_for_search: "DUBIN" #"REEDS_SHEPP" Allows forward and reverse (or "DUBINS" for forward only)
       angle_quantization_bins: 72
-      minimum_turning_radius: 1.2 
+      minimum_turning_radius: 0.8
       change_penalty: 0.20
       non_straight_penalty: 1.20
       cost_penalty: 1.30
