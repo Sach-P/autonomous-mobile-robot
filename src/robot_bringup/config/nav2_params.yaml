@@ -17,7 +17,24 @@ planner_server:
     planner_plugins: ["GridBased"]
 
     GridBased:
-      plugin: "nav2_navfn_planner::NavfnPlanner"
+      plugin: "nav2_smac_planner::SmacPlannerHybrid" # Hybrid-A* for Ackermann
+      downsample_costmap: false
+      downsampling_factor: 1
+      tolerance: 0.25
+      allow_unknown: true
+      max_iterations: 1000000
+      max_on_approach_iterations: 1000
+      max_planning_time: 5.0
+      motion_model_for_search: "DUBIN" #"REEDS_SHEPP" Allows forward and reverse (or "DUBINS" for forward only)
+      angle_quantization_bins: 72
+      minimum_turning_radius: 1.2 
+      change_penalty: 0.20
+      non_straight_penalty: 1.20
+      cost_penalty: 1.30
+      retrospective_penalty: 0.015
+      lookup_table_size: 20.0
+      cache_obstacle_heuristic: false
+      debug_visualizations: false
 
 controller_server:
   ros__parameters:
@@ -29,9 +46,9 @@ controller_server:
     controller_plugins: ["FollowPath"]
     FollowPath:
       plugin: "nav2_regulated_pure_pursuit_controller::RegulatedPurePursuitController"
-      desired_linear_vel: 0.35
+      desired_linear_vel: 0.20
       lookahead_dist: 0.95
-      min_lookahead_dist: 0.6
+      min_lookahead_dist: 0.5
       max_lookahead_dist: 1.5
       lookahead_time: 1.8
       use_velocity_scaled_lookahead_dist: true
@@ -140,6 +157,13 @@ global_costmap:
       robot_radius: 0.2
       global_frame: map
       robot_base_frame: base_footprint
+
+      width: 60
+      height: 60
+      origin_x: -15.0
+      origin_y: -15.0
+
+      track_unknown_space: true
 
       update_frequency: 5.0
       publish_frequency: 2.0
