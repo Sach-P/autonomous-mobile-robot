@@ -1,4 +1,6 @@
 from setuptools import find_packages, setup
+import os
+from glob import glob
 
 package_name = 'robot_behavior'
 
@@ -10,6 +12,7 @@ setup(
         ('share/ament_index/resource_index/packages',
             ['resource/' + package_name]),
         ('share/' + package_name, ['package.xml']),
+        (os.path.join('share', package_name, 'launch'), glob(os.path.join('launch', '*launch.[pxy][yma]'))),
     ],
     install_requires=['setuptools'],
     zip_safe=True,
@@ -24,7 +27,10 @@ setup(
     },
     entry_points={
         'console_scripts': [
-            'goal_pose_publisher = robot_behavior.goal_pose_publisher:main'
+            'goal_pose_publisher = robot_behavior.goal_pose_publisher:main',
+            'goal_client = robot_behavior.goal_client:main',
+            'stop_service = robot_behavior.stop_service:main',
+            'keyboard_stop_client = robot_behavior.keyboard_stop_client:main'
         ],
     },
 )

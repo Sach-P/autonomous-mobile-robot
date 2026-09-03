@@ -46,9 +46,9 @@ controller_server:
     controller_plugins: ["FollowPath"]
     FollowPath:
       plugin: "nav2_regulated_pure_pursuit_controller::RegulatedPurePursuitController"
-      desired_linear_vel: 0.35
+      desired_linear_vel: 0.20
       lookahead_dist: 0.95
-      min_lookahead_dist: 0.6
+      min_lookahead_dist: 0.5
       max_lookahead_dist: 1.5
       lookahead_time: 1.8
       use_velocity_scaled_lookahead_dist: true
@@ -157,6 +157,13 @@ global_costmap:
       robot_radius: 0.2
       global_frame: map
       robot_base_frame: base_footprint
+
+      width: 60
+      height: 60
+      origin_x: -15.0
+      origin_y: -15.0
+
+      track_unknown_space: true
 
       update_frequency: 5.0
       publish_frequency: 2.0
