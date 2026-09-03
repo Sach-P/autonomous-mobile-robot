@@ -23,7 +23,7 @@ def launch_setup(context, *args, **kwargs):
     z_pos     = LaunchConfiguration("z").perform(context)
 
     world_path = world_arg if world_arg else \
-        os.path.join(pkg, "worlds", "cat_robotics.world")
+        os.path.join(pkg, "worlds", "my_world.world")
 
     xacro_file = os.path.join(pkg, "urdf", "rc_car.urdf.xacro")
     robot_description = ParameterValue(
