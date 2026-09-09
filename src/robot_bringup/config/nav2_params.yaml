@@ -131,7 +131,17 @@ local_costmap:
 
         max_obstacle_height: 2.0
 
-        observation_sources: depth_cloud
+        observation_sources: depth_cloud pit_cloud
+
+        pit_cloud:
+          topic: /pit_detector/points
+          data_type: PointCloud2
+          marking: true
+          clearing: false
+          max_obstacle_height: 2.0
+          min_obstacle_height: 0.1
+          obstacle_max_range: 3.0
+          raytrace_max_range: 3.0
 
         depth_cloud:
           topic: /depth_camera/depth_image/points
@@ -198,7 +208,7 @@ global_costmap:
         z_resolution: 0.05
         z_voxels: 16
         max_obstacle_height: 2.0
-        observation_sources: depth_cloud
+        observation_sources: depth_cloud pit_cloud
         depth_cloud:
           topic: /depth_camera/depth_image/points
           data_type: PointCloud2
@@ -207,6 +217,16 @@ global_costmap:
           max_obstacle_height: 2.0
           min_obstacle_height: 0.1
           obstacle_max_range: 2.5
+          raytrace_max_range: 3.0
+
+        pit_cloud:
+          topic: /pit_detector/points
+          data_type: PointCloud2
+          marking: true
+          clearing: false
+          max_obstacle_height: 2.0
+          min_obstacle_height: 0.1
+          obstacle_max_range: 3.0
           raytrace_max_range: 3.0
 
       inflation_layer:
