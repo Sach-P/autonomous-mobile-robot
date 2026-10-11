@@ -1,7 +1,10 @@
 import rclpy
 from rclpy.node import Node
+from rclpy.qos import QoSProfile
+from nav_msgs.msg import OccupancyGrid
 from sensor_msgs.msg import Image, PointCloud2
 from sensor_msgs_py import point_cloud2
+from std_msgs.msg import Header
 import tf2_ros
 import tf2_sensor_msgs
 import numpy as np
@@ -15,21 +18,35 @@ class PitDetector(Node):
 
         self._cloud_pub = self.create_publisher(PointCloud2, '/pit_detector/points', 10)
 
+        qos = QoSProfile(depth=1)
+        qos.durability = rclpy.qos.QoSDurabilityPolicy.TRANSIENT_LOCAL
+        qos.reliability = rclpy.qos.QoSReliabilityPolicy.RELIABLE
+        self._grid_pub = self.create_publisher(OccupancyGrid, '/pit_detector/grid', qos)
+
         self._tf_buffer = tf2_ros.Buffer()
         self._tf_listener = tf2_ros.TransformListener(self._tf_buffer, self)
 
-        self.floor_height_tolerance = 0.025
+
+        self.floor_height_tolerance = 0.075
         self.edge_jump_threshold = 0.15
         self.max_lookahead = 3
-        self.max_lateral = 1
+        self.max_lateral = 1.5
         self.grid_resolution = 0.025
-        self.min_edge_length = 0.05 / self.grid_resolution
+        self.min_edge_length = 0.05 // self.grid_resolution
+
+
+        self.grid_occ_res = 0.1
+        self.grid_size_m = 20.0
+        self.grid_dim = int(self.grid_size_m / self.grid_occ_res)
+        self.grid_origin_x = -self.grid_size_m / 2
+        self.grid_origin_y = -self.grid_size_m / 2
+        self.occupancy = np.full((self.grid_dim, self.grid_dim), -1, dtype=np.int8)
 
     def detection_callback(self, msg: PointCloud2):
 
         try:
             tf_camera_base = self._tf_buffer.lookup_transform('base_footprint', msg.header.frame_id, rclpy.time.Time())
-            # tf_base_odom = self._tf_buffer.lookup_transform('odom', 'base_footprint', rclpy.time.Time())
+            tf_base_map = self._tf_buffer.lookup_transform('map', 'base_footprint', rclpy.time.Time())
         except (tf2_ros.LookupException, tf2_ros.ExtrapolationException):
             return
 
@@ -44,45 +61,28 @@ class PitDetector(Node):
         if not valid.any():
             return
 
-        
 
-        t = tf_camera_base.transform.translation
-        q = tf_camera_base.transform.rotation
-        rotation_matrix = self.quaternion_to_matrix([q.x, q.y, q.z, q.w])
-        translation_vector = np.array([t.x, t.y, t.z])
-
-        points_robot = np.dot(points, rotation_matrix.T) + translation_vector
-    
-        # filter out points above the floor
-        # floor_points = points_robot[points_robot[:, 2] < 0]
-
-        # # filter out points far away where pit detection is not relevant
-
-        # floor_points = floor_points[floor_points[:, 0] < 3]
+        points_robot = self.transform_points(points, tf_camera_base)
 
         edge_points = self.find_pit_edges(points_robot, valid)
 
         if edge_points.size == 0:
+            self.publish_occupancy(msg.header.stamp)
             return
-
-        # t = tf_base_odom.transform.translation
-        # q = tf_base_odom.transform.rotation
-        # rotation_matrix = self.quaternion_to_matrix([q.x, q.y, q.z, q.w])
-        # translation_vector = np.array([t.x, t.y, t.z])
-
-        # odom_points = np.dot(edge_points, rotation_matrix.T) + translation_vector
-
         
+        map_points = self.transform_points(edge_points, tf_base_map)
 
-        edge_cloud = point_cloud2.create_cloud_xyz32(
-            msg.header,
-            edge_points.tolist(),
-        )
+        # edge_cloud = point_cloud2.create_cloud_xyz32(
+        #     msg.header,
+        #     edge_points.tolist(),
+        # )
 
-        edge_cloud.header.frame_id = 'base_footprint'
-        edge_cloud.header.stamp = msg.header.stamp
+        # edge_cloud.header.frame_id = 'base_footprint'
+        # edge_cloud.header.stamp = msg.header.stamp
 
-        self._cloud_pub.publish(edge_cloud)
+        self.mark_grid(map_points)
+        self.publish_occupancy(msg.header.stamp)
+        self.publish_remmebered_points(msg.header.stamp)
 
     def find_pit_edges(self, points, valid):
         height, width, _ = points.shape
@@ -97,10 +97,12 @@ class PitDetector(Node):
         #check how far the jump between pixels is by the x value
         forward_jump = upper[:, :, 0] - lower[:, :, 0]
 
-        #make sure lower pixel is part of the floor
-        lower_is_floor = np.abs(lower[:, :, 2]) < 0.075
+        vertical_jump = upper[:, :, 2] - lower[:, :, 2]
 
-        jump_mask = pair_valid & (
+        #make sure lower pixel is part of the floor
+        lower_is_floor = np.abs(lower[:, :, 2]) < self.floor_height_tolerance
+
+        forward_jump_mask = pair_valid & lower_is_floor & (
             forward_jump > self.edge_jump_threshold
         )
 
@@ -110,14 +112,14 @@ class PitDetector(Node):
         )
 
         candidate = (
-            jump_mask |
+            forward_jump_mask |
             (valid[1:, :] & ~valid[:-1, :])
-        ) & range_mask & lower_is_floor
+        ) & range_mask
 
         self.get_logger().info(
             f'valid={valid.sum()} '
             f'pair_valid={pair_valid.sum()} '
-            f'jump={jump_mask.sum()} '
+            f'front={forward_jump_mask.sum()} '
             f'range={range_mask.sum()} '
             f'floor={lower_is_floor.sum()} '
             f'candidate={candidate.sum()}',
@@ -132,6 +134,7 @@ class PitDetector(Node):
             return np.empty((0, 3), dtype=np.float32)
 
         edge_points = lower[rows, columns]
+        edge_points = np.vstack([edge_points, upper[rows, columns]])
 
         cells = set()
 
@@ -151,8 +154,6 @@ class PitDetector(Node):
 
         l = r = 0
 
-        self.get_logger().info(f"e: {len(edge_points)}")
-
         while r < len(cells):
             while r + 1 < len(cells) and cells[r + 1][1] == cells[r][1] + 1:
                 r += 1
@@ -167,6 +168,53 @@ class PitDetector(Node):
             accepted_points.append([(x + 0.5) * self.grid_resolution, (y + 0.5) * self.grid_resolution, 0.20])
 
         return np.asarray(accepted_points, dtype=np.float32)
+
+
+    def mark_grid(self, points):
+        gx = ((points[:, 0] - self.grid_origin_x) / self.grid_occ_res).astype(int)
+        gy = ((points[:, 1] - self.grid_origin_y) / self.grid_occ_res).astype(int)
+
+        valid = (gx >= 0) & (gx < self.grid_dim) & (gy >= 0) & (gy < self.grid_dim)
+        self.occupancy[gy[valid], gx[valid]] = 100
+
+    def publish_occupancy(self, stamp):
+        msg = OccupancyGrid()
+        msg.header.stamp = stamp
+        msg.header.frame_id = "map"
+        msg.info.resolution = self.grid_occ_res
+        msg.info.width = self.grid_dim
+        msg.info.height = self.grid_dim
+        msg.info.origin.position.x = self.grid_origin_x
+        msg.info.origin.position.y = self.grid_origin_y
+        msg.data = self.occupancy.flatten().tolist()
+        self._grid_pub.publish(msg)
+
+    def publish_remmebered_points(self, stamp):
+        rows, cols = np.where(self.occupancy == 100)
+
+        if rows.size == 0:
+            return
+
+        xs = self.grid_origin_x + (cols + 0.5) * self.grid_occ_res
+        ys = self.grid_origin_y + (rows + 0.5) * self.grid_occ_res
+        zs = np.full_like(xs, 0.20)
+
+        points = np.column_stack([xs, ys, zs])
+
+        header = Header()
+        header.stamp = stamp
+        header.frame_id = "map"
+
+        cloud = point_cloud2.create_cloud_xyz32(header, points.tolist())
+        self._cloud_pub.publish(cloud)
+
+
+    def transform_points(self, points, tf):
+        t = tf.transform.translation
+        q = tf.transform.rotation
+        rotation_matrix = self.quaternion_to_matrix([q.x, q.y, q.z, q.w])
+        translation_vector = np.array([t.x, t.y, t.z])
+        return np.dot(points, rotation_matrix.T) + translation_vector
 
 
     def quaternion_to_matrix(self, q):

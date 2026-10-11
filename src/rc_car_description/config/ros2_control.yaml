@@ -47,23 +47,6 @@ ackermann_steering_controller:
 
     publish_limited_velocity: true
 
-    gains:
-      front_left_steer_joint:
-        p: 500.0
-        i: 10.0
-        d: 50.0
-      front_right_steer_joint:
-        p: 500.0
-        i: 10.0
-        d: 50.0
-      rear_left_wheel_joint:
-        p: 50.0
-        i: 1.0
-        d: 5.0
-      rear_right_wheel_joint:
-        p: 50.0
-        i: 1.0
-        d: 5.0
 
     linear:
       x:

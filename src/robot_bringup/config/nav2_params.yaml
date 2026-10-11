@@ -46,7 +46,7 @@ controller_server:
     controller_plugins: ["FollowPath"]
     FollowPath:
       plugin: "nav2_regulated_pure_pursuit_controller::RegulatedPurePursuitController"
-      desired_linear_vel: 0.20
+      desired_linear_vel: 0.30
       lookahead_dist: 0.95
       min_lookahead_dist: 0.5
       max_lookahead_dist: 1.5
@@ -187,6 +187,12 @@ global_costmap:
         plugin: "nav2_costmap_2d::StaticLayer"
         map_subscribe_transient_local: true
 
+      # pit_layer:
+      #   plugin: "nav2_costmap_2d::StaticLayer"
+      #   map_topic: /pit_detector/grid
+      #   subscribe_to_updates: true
+      #   map_subscribe_transient_local: true
+
       obstacle_layer:
         plugin: "nav2_costmap_2d::ObstacleLayer"
 
@@ -209,6 +215,7 @@ global_costmap:
         z_voxels: 16
         max_obstacle_height: 2.0
         observation_sources: depth_cloud pit_cloud
+
         depth_cloud:
           topic: /depth_camera/depth_image/points
           data_type: PointCloud2
@@ -226,8 +233,8 @@ global_costmap:
           clearing: false
           max_obstacle_height: 2.0
           min_obstacle_height: 0.1
-          obstacle_max_range: 3.0
-          raytrace_max_range: 3.0
+          obstacle_max_range: 50.0
+          raytrace_max_range: 50.0
 
       inflation_layer:
         plugin: "nav2_costmap_2d::InflationLayer"

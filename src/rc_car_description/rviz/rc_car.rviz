@@ -134,6 +134,8 @@ Visualization Manager:
       Visual Enabled: true
     - Class: rviz_default_plugins/TF
       Enabled: true
+      Filter (blacklist): ""
+      Filter (whitelist): ""
       Frame Timeout: 15
       Frames:
         All Enabled: true
@@ -217,7 +219,7 @@ Visualization Manager:
       Color: 255; 255; 0
       Color Transformer: Intensity
       Decay Time: 0
-      Enabled: true
+      Enabled: false
       Invert Rainbow: false
       Max Color: 255; 255; 255
       Max Intensity: 0
@@ -238,8 +240,10 @@ Visualization Manager:
         Value: /scan
       Use Fixed Frame: true
       Use rainbow: true
-      Value: true
+      Value: false
     - Alpha: 0.800000011920929
+      Binary representation: false
+      Binary threshold: 100
       Class: rviz_default_plugins/Map
       Color Scheme: map
       Draw Behind: false
@@ -338,7 +342,7 @@ Visualization Manager:
       Color: 255; 255; 255
       Color Transformer: RGB8
       Decay Time: 0
-      Enabled: true
+      Enabled: false
       Invert Rainbow: false
       Max Color: 255; 255; 255
       Max Intensity: 4096
@@ -353,13 +357,12 @@ Visualization Manager:
       Topic:
         Depth: 5
         Durability Policy: Volatile
-        Filter size: 10
         History Policy: Keep Last
         Reliability Policy: Reliable
         Value: /depth_camera/depth_image/points
       Use Fixed Frame: true
       Use rainbow: true
-      Value: true
+      Value: false
     - Class: rviz_default_plugins/Image
       Enabled: true
       Max Value: 1
@@ -375,6 +378,8 @@ Visualization Manager:
         Value: /depth_camera/depth_image
       Value: true
     - Alpha: 0.699999988079071
+      Binary representation: false
+      Binary threshold: 100
       Class: rviz_default_plugins/Map
       Color Scheme: costmap
       Draw Behind: false
@@ -396,6 +401,8 @@ Visualization Manager:
       Use Timestamp: false
       Value: true
     - Alpha: 0.699999988079071
+      Binary representation: false
+      Binary threshold: 100
       Class: rviz_default_plugins/Map
       Color Scheme: costmap
       Draw Behind: false
@@ -538,9 +545,9 @@ Window Geometry:
   Hide Right Dock: false
   Image:
     collapsed: false
-  QMainWindow State: 000000ff00000000fd00000001000000000000027a000003b5fc0200000005fb0000000a0049006d006100670065010000003f000000d60000002900fffffffb0000000c00430061006d006500720061010000011b0000006b0000002900fffffffb000000100044006900730070006c006100790073010000018c0000019c000000cc00fffffffb0000000a00560069006500770073010000032e000000c6000000a900fffffffb0000000c00430061006d006500720061010000027e0000007e000000000000000000000500000003b500000004000000040000000800000008fc0000000100000002000000010000000a0054006f006f006c00730100000000ffffffff0000000000000000
+  QMainWindow State: 000000ff00000000fd00000001000000000000027a000003b5fc0200000005fb0000000a0049006d006100670065010000003f000000d60000001700fffffffb0000000c00430061006d006500720061010000011b0000006b0000001700fffffffb000000100044006900730070006c006100790073010000018c0000019c000000cc00fffffffb0000000a00560069006500770073010000032e000000c6000000a900fffffffb0000000c00430061006d006500720061010000027e0000007e000000000000000000000500000003b500000004000000040000000800000008fc0000000100000002000000010000000a0054006f006f006c00730100000000ffffffff0000000000000000
   Views:
     collapsed: false
   Width: 1920
-  X: 1920
-  Y: 0
+  X: 0
+  Y: 32
