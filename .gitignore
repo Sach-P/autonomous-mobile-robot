@@ -3,4 +3,5 @@ install/*
 build/*
 log/*
 venv/*
+cmd.txt
 **/__pycache__/*

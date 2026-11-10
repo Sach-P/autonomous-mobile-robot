@@ -12,6 +12,7 @@ import math
 from geometry_msgs.msg import PoseStamped
 import json
 import requests
+from std_msgs.msg import String
 
 
 OLLAMA_URL = 'http://localhost:11434/api/chat'
@@ -49,15 +50,15 @@ class SemanticNavigator(Node):
     def __init__(self):
         super().__init__('semantic_navigator')
         self._action_client = ActionClient(self, NavigateThroughPoses, 'navigate_through_poses')
+
+        self.create_subscription(String, '/user_request', self.request_callback, 10)
+
                 
         self._tf_buffer = tf2_ros.Buffer()
         self._tf_listener = tf2_ros.TransformListener(self._tf_buffer, self)
 
-        self._test_timer = self.create_timer(2.0, self._test_goal)
-
-    def _test_goal(self):
-        self._test_timer.cancel()     
-        observation_id = self.select_object('Take me to something green')
+    def request_callback(self, msg):  
+        observation_id = self.select_object(msg.data)
         if observation_id is None:
             self.get_logger().warn("No valid observation selected")
             return
