@@ -7,12 +7,14 @@ Panels:
         - /Global Options1
         - /PointCloud21
       Splitter Ratio: 0.5
-    Tree Height: 278
+    Tree Height: 112
   - Class: rviz_common/Views
     Expanded:
       - /Current View1
     Name: Views
     Splitter Ratio: 0.5
+  - Class: nav2_rviz_plugins/Navigation 2
+    Name: Navigation 2
 Visualization Manager:
   Class: ""
   Displays:
@@ -317,7 +319,7 @@ Visualization Manager:
         Value: /ackermann_steering_controller/odometry
       Value: true
     - Class: rviz_default_plugins/Image
-      Enabled: true
+      Enabled: false
       Max Value: 1
       Median window: 5
       Min Value: 0
@@ -329,7 +331,7 @@ Visualization Manager:
         History Policy: Keep Last
         Reliability Policy: Reliable
         Value: /camera/image_raw
-      Value: true
+      Value: false
     - Alpha: 1
       Autocompute Intensity Bounds: true
       Autocompute Value Bounds:
@@ -364,7 +366,7 @@ Visualization Manager:
       Use rainbow: true
       Value: false
     - Class: rviz_default_plugins/Image
-      Enabled: true
+      Enabled: false
       Max Value: 1
       Median window: 5
       Min Value: 0
@@ -376,7 +378,7 @@ Visualization Manager:
         History Policy: Keep Last
         Reliability Policy: Reliable
         Value: /depth_camera/depth_image
-      Value: true
+      Value: false
     - Alpha: 0.699999988079071
       Binary representation: false
       Binary threshold: 100
@@ -451,6 +453,20 @@ Visualization Manager:
         Reliability Policy: Reliable
         Value: /plan
       Value: true
+    - Class: rviz_default_plugins/Image
+      Enabled: false
+      Max Value: 1
+      Median window: 5
+      Min Value: 0
+      Name: Image
+      Normalize Range: true
+      Topic:
+        Depth: 5
+        Durability Policy: Volatile
+        History Policy: Keep Last
+        Reliability Policy: Reliable
+        Value: /semantic_mapper/debug_image
+      Value: false
   Enabled: true
   Global Options:
     Background Color: 48; 48; 48
@@ -495,25 +511,25 @@ Visualization Manager:
   Views:
     Current:
       Class: rviz_default_plugins/Orbit
-      Distance: 18.507869720458984
+      Distance: 23.93161392211914
       Enable Stereo Rendering:
         Stereo Eye Separation: 0.05999999865889549
         Stereo Focal Distance: 1
         Swap Stereo Eyes: false
         Value: false
       Focal Point:
-        X: -0.19885076582431793
-        Y: 0.25725293159484863
-        Z: 0.040356870740652084
+        X: 0.1662348061800003
+        Y: -0.3264210522174835
+        Z: -0.26799505949020386
       Focal Shape Fixed Size: true
       Focal Shape Size: 0.05000000074505806
       Invert Z Axis: false
       Name: Current View
       Near Clip Distance: 0.009999999776482582
-      Pitch: 0.9747966527938843
+      Pitch: 1.084796667098999
       Target Frame: base_link
       Value: Orbit (rviz)
-      Yaw: 4.421815395355225
+      Yaw: 4.731816291809082
     Saved:
       - Class: rviz_default_plugins/Orbit
         Distance: 6.859731197357178
@@ -540,14 +556,16 @@ Window Geometry:
     collapsed: false
   Displays:
     collapsed: false
-  Height: 1043
+  Height: 1163
   Hide Left Dock: false
   Hide Right Dock: false
   Image:
     collapsed: false
-  QMainWindow State: 000000ff00000000fd00000001000000000000027a000003b5fc0200000005fb0000000a0049006d006100670065010000003f000000d60000001700fffffffb0000000c00430061006d006500720061010000011b0000006b0000001700fffffffb000000100044006900730070006c006100790073010000018c0000019c000000cc00fffffffb0000000a00560069006500770073010000032e000000c6000000a900fffffffb0000000c00430061006d006500720061010000027e0000007e000000000000000000000500000003b500000004000000040000000800000008fc0000000100000002000000010000000a0054006f006f006c00730100000000ffffffff0000000000000000
+  Navigation 2:
+    collapsed: false
+  QMainWindow State: 000000ff00000000fd00000001000000000000027a0000042dfc0200000007fb0000000a0049006d006100670065000000003f000000470000001700fffffffb0000000c00430061006d0065007200610200000a1600000020000003bd00000284fb000000100044006900730070006c006100790073010000003f000000f6000000cc00fffffffb0000000a00560069006500770073010000013b000000cb000000a900fffffffb0000000c00430061006d006500720061010000027e0000007e0000000000000000fb00000018004e0061007600690067006100740069006f006e00200032010000020c00000260000001e400fffffffb0000000a0049006d006100670065020000077600000020000004dd00000224000005000000042d00000004000000040000000800000008fc0000000100000002000000010000000a0054006f006f006c00730100000000ffffffff0000000000000000
   Views:
     collapsed: false
   Width: 1920
   X: 0
-  Y: 32
+  Y: 0

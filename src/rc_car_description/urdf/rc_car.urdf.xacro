@@ -108,13 +108,13 @@
   </link>
 
   <link name="body_top">
-    <inertial>
+    <!-- <inertial>
       <origin xyz="0 0 ${chassis_height*0.4}" rpy="0 0 0"/>
       <mass value="0.1"/>
       <inertia ixx="0.0001" ixy="0" ixz="0"
                iyy="0.0001" iyz="0"
                izz="0.0001"/>
-    </inertial>
+    </inertial> -->
     <visual>
       <origin xyz="0 0 ${chassis_height*0.4}" rpy="0 0 0"/>
       <geometry><box size="${chassis_length*0.7} ${chassis_width*0.85} ${chassis_height*0.8}"/></geometry>
@@ -311,13 +311,13 @@
        LIDAR LINK
   ============================================================ -->
   <link name="lidar_link">
-    <inertial>
+    <!-- <inertial>
       <origin xyz="0 0 0" rpy="0 0 0"/>
       <mass value="0.15"/>
       <inertia ixx="0.000830" ixy="0" ixz="0"
                iyy="0.000830" iyz="0"
                izz="0.001027"/>
-    </inertial>
+    </inertial> -->
     <visual>
       <origin xyz="0 0 0" rpy="0 0 0"/>
       <geometry><cylinder radius="0.0516" length="0.0717"/></geometry>

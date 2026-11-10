@@ -58,7 +58,7 @@ def launch_setup(context, *args, **kwargs):
 
     # ── 3. Spawn robot (delayed for Gazebo to start) ────────────
     spawn = TimerAction(
-        period=1.5,
+        period=5.0,
         actions=[Node(
             package="ros_gz_sim",
             executable="create",

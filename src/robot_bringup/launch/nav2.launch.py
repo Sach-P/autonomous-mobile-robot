@@ -26,7 +26,13 @@ def generate_launch_description():
         default_value='true'
     )
 
-
+    pit_detector = Node(
+        package='pit_detection',
+        executable='pit_detector',
+        name='pit_detector',
+        output='screen',
+        parameters=[{"use_sim_time": True}],
+    )
 
 
     slam = IncludeLaunchDescription(
@@ -59,6 +65,8 @@ def generate_launch_description():
 
     return LaunchDescription([
         declare_use_sim_time,
+
+        pit_detector,
 
         slam,
 
